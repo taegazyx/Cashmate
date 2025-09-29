@@ -5,8 +5,8 @@
 
 ## ขั้นตอนติดตั้ง (สำหรับนักพัฒนา)
 1. Clone repo:
-git clone https://github.com/Thanapat68030116/Project-Personal-income-and-expenses
-cd Project-Personal-income-and-expenses
+git clone https://github.com/taegazyx/Cashmate
+cd Cashmate
 
 r
 Copy code
