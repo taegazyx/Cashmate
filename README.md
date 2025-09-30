@@ -1,21 +1,8 @@
 # CASHMATH – ระบบ Login/Register + Dashboard
 
-# โปรแกรมนี้เป็นแอปพลิเคชัน GUI สำหรับ ล็อกอิน / ลงทะเบียนผู้ใช้ โดยเชื่อมต่อกับฐานข้อมูล MySQL/MariaDB และใช้ bcrypt ในการเข้ารหัสรหัสผ่าน
+# โปรแกรมนี้เป็นแอปพลิเคชัน GUI สำหรับ ล็อกอิน / ลงทะเบียนผู้ใช้ โดยเชื่อมต่อกับฐานข้อมูล MariaDB และใช้ bcrypt ในการเข้ารหัสรหัสผ่าน
 
 # สร้างด้วย Python + CustomTkinter
-
-
-# ฟีเจอร์
-
-✅ ลงทะเบียนผู้ใช้ใหม่ (Register)
-
-✅ ล็อกอินด้วยอีเมลและรหัสผ่าน
-
-✅ เก็บรหัสผ่านแบบเข้ารหัส (bcrypt)
-
-✅ แสดงหน้า Dashboard หลังเข้าสู่ระบบ
-
-✅ UI สวยงามด้วย CustomTkinter
 
 ## ขั้นตอนติดตั้ง (สำหรับนักพัฒนา)
 1. Python Libraries (ติดตั้งด้วย pip install)
@@ -65,10 +52,6 @@
   pip install -r requirements.txt
 
 
-# Clone repo:
-  git clone https://github.com/taegazyx/Cashmate
-  cd Cashmate
-
 # สุดท้าย วิธีการใช้งาน
 
   รันโปรแกรม
@@ -83,6 +66,40 @@
   ถ้าเป็นผู้ใช้เดิม → กรอกอีเมลและรหัสผ่านเพื่อเข้าสู่ระบบ
 
   หลังล็อกอินสำเร็จ → จะเข้าสู่หน้า Dashboard
+
+## คำสั่ง git ต่างๆ
+  1.  git init -สร้าง repository
+  2.  git add ชื่อไฟล์ หรือใส่ . จะแอดไฟล์ทั้งหมด
+  3.  git commit -m "ข้อความ" -commit ข้อความทุกครั้งที่กระทำอะไรก็ตามกับไฟล์
+  4.  git rm <ชื่อไฟล์> -ลบไฟล์ออกจาก git
+  5.  git log -ดูประวัติแบบเต็ม
+  6.  git log --oneline -ดูประวัติแบบสั้นๆ
+  7.  git status -เช็คไฟล์ว่าถูก track หรือยัง
+  8.  git clone https://github.com/taegazyx/Cashmate 
+  9.  git mv เก่า ใหม่ -เปลี่ยนชื่อหรือย้ายไฟล์
+  10. git branch -เช็คว่าตัวเองอยู่ branch ไหน
+  11. git checkout branch -สลับไป branch ที่ต้องการ
+  12. git checkout -b branch -สร้าง branch ใหม่ + สลับไปด้วย ***กรณีไม่เคยสร้าง branch แยกเลย
+  13. git merge branch -รวม branch อื่นเข้ามาที่ branch ปัจจุบัน 
+  14. git remote -v → ดู remote ที่เชื่อมอยู่
+  15. git remote add origin https://github.com/taegazyx/Cashmate → เพิ่ม remote
+  16. git push origin branch → อัปโหลด branch ไปที่ remote
+  17. git push -u origin branch → อัปโหลด + ตั้งให้ track กับ remote
+  18. git pull origin branch → ดึงการเปลี่ยนแปลงจาก remot
+
+  ## ถ้าเกิดทำไม่เป็นโปรดอ่านนะจ้ะ
+
+  1. สร้าง repo พิมพ์ git init ไฟล์เราถ้ามีอย่าเพิ่ง add นะไว้ใน add ใน branch ของตัวเอง 
+  2. พิมพ์ใน terminal  git remote add origin https://github.com/taegazyx/Cashmate
+  3. เช็คว่า remote แล้วมั้ย git remote -v
+  4. ถ้า remote แล้วจะเป็นลิงก์ github หลังจากนั้นก็ใช้ git pull origin main ก่อนมาเก็บไว้
+  5. หลังจากนั้นก็ git pull origin (feature/ของแต่ละคนนะ) เช่น git pull origin feature/notification ถ้ามี branch ของเราอยู่บน github แล้ว 
+  6. ถ้ายังไม่มีก็สร้าง branch เรามาโดยพิมพ์ git checkout -b (feature/ของแต่ละคนนะ) ตัวอย่างเช่น git checkout -b feature/notification
+  7. เราก็แอดไฟล์หรือโค้ดเข้า branch ตัวเองเลย เช็คด้วย git status
+  8. ถ้าเราพอใจแล้วก็ส่งโค้ดขึ้น github โดยพิมพ์  git push -u origin ชื่อbranch *กรณีครั้งแรกเพื่อให้ track กับ remote
+  9. จากนั้นไม่ต้องพิมพ์คำสั่งนี้แล้ว ให้พิมพ์ git push origin ชื่อbranch ทุกครั้งที่อัปโหลด
+  10. และพิมพ์ git pull origin ชื่อbranch ทุกครั้งที่ต้องการดึงข้อมูลให้โค้ดเป็นปัจจุบัน 
+  11. **ข้อควรละวังนะถ้าจะดึง branch ไหนให้ทำใน branch นั้น เช่น จะดึง branch feature/home บน github บนเครื่องเราก็ต้องอยู่ branch feature/home ด้วย**
 
 
 ## กติกาการทำงานร่วมกัน (สรุป)
