@@ -1,86 +1,155 @@
+import customtkinter as ctk
 import tkinter as tk
-from tkinter import ttk
+from PIL import Image, ImageTk
 
 def create_profile_page(root):
-    """
-    สร้างหน้าต่างโปรไฟล์ผู้ใช้
-    """
-    profile_frame = tk.Frame(root, bg="#B2F0C1")  # พื้นหลังสีฟ้าอ่อน
+    # Set the theme and color scheme
+    ctk.set_appearance_mode("light")
+    ctk.set_default_color_theme("green")
+
+    # Main frame with mint green background
+    profile_frame = ctk.CTkFrame(root, fg_color="#B2F0C1")
     profile_frame.pack(fill=tk.BOTH, expand=True)
 
-    # --- ส่วนหัว (โลโก้และชื่อแอป) ---
-    app_logo_label = tk.Label(profile_frame, text="🏦", font=("Arial", 60), bg="#B2F0C1")
-    app_logo_label.pack(pady=(20, 5))
+    # Bank icon and app name
+    bank_label = ctk.CTkLabel(profile_frame, text="🏦", font=ctk.CTkFont(size=60))
+    bank_label.pack(pady=(20, 5))
     
-    app_name_label = tk.Label(profile_frame, text="CashMate App", font=("Arial", 16, "bold"), bg="#B2EBF2")
+    app_name_label = ctk.CTkLabel(
+        profile_frame, 
+        text="CashMate App", 
+        font=ctk.CTkFont(size=24, weight="bold"),
+        text_color="#333333"
+    )
     app_name_label.pack(pady=(0, 20))
 
-    # --- กรอบสำหรับเนื้อหาหลัก (User Profile) ---
-    content_frame = tk.Frame(profile_frame, bg="white", bd=2, relief="groove")
+    # White content frame with rounded corners
+    content_frame = ctk.CTkFrame(
+        profile_frame,
+        fg_color="white",
+        corner_radius=15,
+        border_width=2,
+        border_color="#EAEAEA"
+    )
     content_frame.pack(pady=20, padx=20, ipadx=20, ipady=20)
-    
-    # เพิ่มโค้งมนให้กับกรอบ
-    content_frame.config(highlightbackground="gray", highlightthickness=1, borderwidth=5)
 
-    # หัวข้อ "User Profile"
-    profile_title = tk.Label(content_frame, text="User Profile", font=("Arial", 24, "bold"), bg="white")
+    # User Profile heading
+    profile_title = ctk.CTkLabel(
+        content_frame,
+        text="User Profile",
+        font=ctk.CTkFont(size=28, weight="bold"),
+        text_color="#333333"
+    )
     profile_title.pack(pady=(10, 20))
 
-    # --- รูปภาพโปรไฟล์ (ใช้ placeholder เป็นวงกลม) ---
-    profile_canvas = tk.Canvas(content_frame, width=150, height=150, bg="white", highlightthickness=0)
-    profile_canvas.pack(pady=10)
-    profile_canvas.create_oval(10, 10, 140, 140, fill="#E6F2FF", outline="#D3D3D3")
+    # Profile picture frame (circular background)
+    profile_frame = ctk.CTkFrame(
+        content_frame,
+        width=120,
+        height=120,
+        corner_radius=60,
+        fg_color="#E8F4FF"
+    )
+    profile_frame.pack(pady=10)
+    profile_frame.pack_propagate(False)
+
+    # Add a simple avatar label inside the circular frame
+    avatar_label = ctk.CTkLabel(
+        profile_frame,
+        text="👤",
+        font=ctk.CTkFont(size=50),
+        text_color="#666666"
+    )
+    avatar_label.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+
+    # User information
+    name_label = ctk.CTkLabel(
+        content_frame,
+        text="Name :",
+        font=ctk.CTkFont(size=16),
+        text_color="#666666"
+    )
+    name_label.pack(pady=(20, 5))
+
+    email_label = ctk.CTkLabel(
+        content_frame,
+        text="Email : xxx@gmail.com",
+        font=ctk.CTkFont(size=16),
+        text_color="#666666"
+    )
+    email_label.pack(pady=(0, 20))
+
+    # Buttons
+    button_style = {"width": 150, "height": 35, "corner_radius": 8, "font": ctk.CTkFont(size=14)}
     
-    # เพิ่มรูปภาพผู้ใช้ (ในโค้ดนี้ใช้เป็นตัวอย่าง)
-    # หากต้องการใช้รูปภาพจริง:
-    # try:
-    #     user_img = tk.PhotoImage(file="path/to/your/image.png")
-    #     profile_canvas.create_image(75, 75, image=user_img)
-    # except tk.TclError:
-    #     pass # จัดการในกรณีที่หารูปภาพไม่พบ
-
-    # --- ข้อมูลโปรไฟล์ ---
-    name_label = tk.Label(content_frame, text="Name :", font=("Arial", 14), bg="white")
-    name_label.pack(pady=(20, 0))
-    
-    email_label = tk.Label(content_frame, text="Email : xxx@gmail.com", font=("Arial", 14), bg="white")
-    email_label.pack(pady=(5, 20))
-
-    # --- ปุ่มต่างๆ ---
-    # ใช้ ttk.Button เพื่อให้มีสไตล์ที่ดูทันสมัยขึ้น
-    button_style = ttk.Style()
-    button_style.configure("TButton", font=("Arial", 12), padding=10, background="#666666", foreground="white")
-
-    button_frame1 = tk.Frame(content_frame, bg="white")
+    # First row of buttons
+    button_frame1 = ctk.CTkFrame(content_frame, fg_color="transparent")
     button_frame1.pack(pady=5)
     
-    edit_button = ttk.Button(button_frame1, text="Edit Profile")
-    edit_button.pack(side=tk.LEFT, padx=10)
+    edit_profile_btn = ctk.CTkButton(
+        button_frame1,
+        text="Edit Profile",
+        fg_color="#666666",
+        hover_color="#4D4D4D",
+        **button_style
+    )
+    edit_profile_btn.pack(side=tk.LEFT, padx=5)
     
-    change_pass_button = ttk.Button(button_frame1, text="Change Password")
-    change_pass_button.pack(side=tk.LEFT, padx=10)
+    change_pass_btn = ctk.CTkButton(
+        button_frame1,
+        text="Change Password",
+        fg_color="#666666",
+        hover_color="#4D4D4D",
+        **button_style
+    )
+    change_pass_btn.pack(side=tk.LEFT, padx=5)
 
-    button_frame2 = tk.Frame(content_frame, bg="white")
+    # Second row of buttons
+    button_frame2 = ctk.CTkFrame(content_frame, fg_color="transparent")
     button_frame2.pack(pady=5)
     
-    privacy_button = ttk.Button(button_frame2, text="Privacy & Policy / How to Use")
-    privacy_button.pack(side=tk.LEFT, padx=10)
+    privacy_btn = ctk.CTkButton(
+        button_frame2,
+        text="Privacy & Policy / How to Use",
+        fg_color="#666666",
+        hover_color="#4D4D4D",
+        width=310,
+        height=35,
+        corner_radius=8,
+        font=ctk.CTkFont(size=14)
+    )
+    privacy_btn.pack(pady=5)
     
-    logout_button = ttk.Button(button_frame2, text="Logout")
-    logout_button.pack(side=tk.LEFT, padx=10)
+    logout_btn = ctk.CTkButton(
+        button_frame2,
+        text="Logout",
+        fg_color="#666666",
+        hover_color="#4D4D4D",
+        width=310,
+        height=35,
+        corner_radius=8,
+        font=ctk.CTkFont(size=14)
+    )
+    logout_btn.pack(pady=5)
 
-    # --- ปุ่ม "Back to Home" ---
-    back_home_button = tk.Button(profile_frame, text="Back to Home", font=("Arial", 16), bg="#6A5ACD", fg="white", relief="raised", bd=3)
-    back_home_button.pack(pady=20, ipadx=50, ipady=10)
-    
-    # ทำให้ปุ่มมีโค้งมน
-    back_home_button.config(border=5, relief="raised", highlightbackground="#6A5ACD", highlightcolor="#6A5ACD")
+    # Back to Home button
+    back_home_btn = ctk.CTkButton(
+        content_frame,
+        text="Back to Home",
+        fg_color="#666666",
+        hover_color="#4D4D4D",
+        width=310,
+        height=35,
+        corner_radius=8,
+        font=ctk.CTkFont(size=14)
+    )
+    back_home_btn.pack(pady=15)
 
 
 if __name__ == "__main__":
-    root = tk.Tk()
+    root = ctk.CTk()
     root.title("User Profile")
-    root.geometry("400x700")  # กำหนดขนาดหน้าต่างเริ่มต้น
+    root.geometry("400x750")
     
     create_profile_page(root)
     
