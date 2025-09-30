@@ -97,8 +97,8 @@
   6. ถ้ายังไม่มีก็สร้าง branch เรามาโดยพิมพ์ git checkout -b (feature/ของแต่ละคนนะ) ตัวอย่างเช่น git checkout -b feature/notification
   7. เราก็แอดไฟล์หรือโค้ดเข้า branch ตัวเองเลย เช็คด้วย git status
   8. ถ้าเราพอใจแล้วก็ส่งโค้ดขึ้น github โดยพิมพ์  git push -u origin ชื่อbranch *กรณีครั้งแรกเพื่อให้ track กับ remote
-  9. จากนั้นไม่ต้องพิมพ์คำสั่งนี้แล้ว ให้พิมพ์ git push origin ชื่อbranch ทุกครั้งที่อัปโหลด
-  10. และพิมพ์ git pull origin ชื่อbranch ทุกครั้งที่ต้องการดึงข้อมูลให้โค้ดเป็นปัจจุบัน 
+  9. จากนั้นไม่ต้องพิมพ์คำสั่งนี้แล้ว ให้พิมพ์ git push origin ชื่อbranch ทุกครั้งที่อัปโหลด หรือจะพิมพ์ git push
+  10. และพิมพ์ git pull origin ชื่อbranch ทุกครั้งที่ต้องการดึงข้อมูลให้โค้ดเป็นปัจจุบัน หรือจะพิมพ์ git pull 
   11. **ข้อควรละวังนะถ้าจะดึง branch ไหนให้ทำใน branch นั้น เช่น จะดึง branch feature/home บน github บนเครื่องเราก็ต้องอยู่ branch feature/home ด้วย**
 
 
