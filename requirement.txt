@@ -1,0 +1,5 @@
+# โปรแกรมที่ต้องติดตั้งใน Vs code
+customtkinter
+Pillow
+mysql-connector-python
+bcrypt
