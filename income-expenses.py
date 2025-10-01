@@ -54,3 +54,14 @@ title_frame = ctk.CTkFrame(app, fg_color="transparent")
 title_frame.pack(pady=10)
 ctk.CTkLabel(title_frame, image=img_bank, text="").pack()
 ctk.CTkLabel(title_frame, text="CashMate App", font=("Arial Rounded MT Bold", 24)).pack()
+
+# ---------- กรอก Income -----------
+income_frame = ctk.CTkFrame(app, corner_radius=15, border_width=1)
+income_frame.pack(pady=10, padx=20, fill="x")
+income_entry = ctk.CTkEntry(income_frame, placeholder_text="กรอกจำนวนรายรับ (Bath)")
+income_entry.pack(pady=10, padx=20)
+income_btn = ctk.CTkButton(income_frame, text="บันทึกรายรับ", command=set_income)
+income_btn.pack(pady=5)
+income_label = ctk.CTkLabel(income_frame, text="รายรับ (Income) : xxxx Bath",
+                            font=("Arial", 16))
+income_label.pack(pady=10)
