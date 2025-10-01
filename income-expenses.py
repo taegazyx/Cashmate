@@ -86,10 +86,18 @@ btn_other = ctk.CTkButton(category_frame, text="อื่นๆ\nOther", image=i
                           compound="top", command=lambda: add_expense("Other"))
 btn_other.grid(row=1, column=1, padx=10, pady=10)
 
-# ยอดคงเหลือ
+# ----------- ยอดคงเหลือ -----------
 balance_frame = ctk.CTkFrame(app, corner_radius=15, border_width=1)
 balance_frame.pack(pady=10, padx=20, fill="x")
 ctk.CTkLabel(balance_frame, image=img_balance, text="").pack(side="left", padx=10)
 balance_label = ctk.CTkLabel(balance_frame, text="ยอดคงเหลือ (Total Balance) : xxxx Bath",
                              font=("Arial", 16))
 balance_label.pack(pady=15)
+
+# ---------- ปุ่มกลับหน้าแรก -----------
+home_btn = ctk.CTkButton(app, text="Back to Home",
+                         font=("Arial Rounded MT Bold", 16))
+home_btn.pack(pady=20)
+
+# ---------- Run ----------
+app.mainloop()
