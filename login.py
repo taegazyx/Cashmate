@@ -2,6 +2,14 @@ import tkinter as tk
 from tkinter import messagebox
 from PIL import Image, ImageTk
 
+def login_action():
+    username = username_entry.get()
+    password = password_entry.get()
+
+    if username and password:
+        messagebox.showinfo("Login Successful", f"Welcome, {username}!")
+    else:
+        messagebox.showwarning("Input Error", "Please enter both username and password.")
 
 root = tk.Tk()
 root.title("CashMate App Login") # <----- App Name
@@ -58,6 +66,7 @@ canvas.create_window(200, 355, window=password_entry)
 #Login Button
 login_button = tk.Button(root, text="Log in", font=("Arial", 14, "bold"),
                          bg="#5ec57e", fg="white",
+                         command=login_action,
                          relief="flat", activebackground="#4C704E", activeforeground="white")
 canvas.create_window(200, 420, window=login_button)
 
