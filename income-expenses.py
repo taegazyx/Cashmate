@@ -65,3 +65,23 @@ income_btn.pack(pady=5)
 income_label = ctk.CTkLabel(income_frame, text="รายรับ (Income) : xxxx Bath",
                             font=("Arial", 16))
 income_label.pack(pady=10)
+
+# ---------- ปุ่มหมวดหมู่รายจ่าย -----------
+category_frame = ctk.CTkFrame(app, corner_radius=15)
+category_frame.pack(pady=20, padx=20, fill="both", expand=True)
+btn_food = ctk.CTkButton(category_frame, text="อาหาร\nFood", image=img_food,
+                         font=("Arial", 14), height=120, width=120,
+                         compound="top", command=lambda: add_expense("Food"))
+btn_food.grid(row=0, column=0, padx=10, pady=10)
+btn_transport = ctk.CTkButton(category_frame, text="เดินทาง\nTransport", image=img_transport,
+                              font=("Arial", 14), height=120, width=120,
+                              compound="top", command=lambda: add_expense("Transport"))
+btn_transport.grid(row=0, column=1, padx=10, pady=10)
+btn_entertain = ctk.CTkButton(category_frame, text="บันเทิง\nEntertainment", image=img_entertain,
+                              font=("Arial", 14), height=120, width=120,
+                              compound="top", command=lambda: add_expense("Entertainment"))
+btn_entertain.grid(row=1, column=0, padx=10, pady=10)
+btn_other = ctk.CTkButton(category_frame, text="อื่นๆ\nOther", image=img_other,
+                          font=("Arial", 14), height=120, width=120,
+                          compound="top", command=lambda: add_expense("Other"))
+btn_other.grid(row=1, column=1, padx=10, pady=10)
