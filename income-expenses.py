@@ -48,3 +48,9 @@ img_transport = ctk.CTkImage(light_image=Image.open("transport.jpg"), size=(60, 
 img_entertain = ctk.CTkImage(light_image=Image.open("entertainment.jpg"), size=(60, 60))
 img_other = ctk.CTkImage(light_image=Image.open("other.jpg"), size=(60, 60))
 img_balance = ctk.CTkImage(light_image=Image.open("balance.jpg"), size=(40, 40))
+
+# ---------- ส่วนหัว -----------
+title_frame = ctk.CTkFrame(app, fg_color="transparent")
+title_frame.pack(pady=10)
+ctk.CTkLabel(title_frame, image=img_bank, text="").pack()
+ctk.CTkLabel(title_frame, text="CashMate App", font=("Arial Rounded MT Bold", 24)).pack()
