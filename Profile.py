@@ -17,9 +17,27 @@ def create_profile_page(root):
     content_container = ctk.CTkFrame(main_frame, fg_color="transparent")
     content_container.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
 
+    # Top navigation frame
+    nav_frame = ctk.CTkFrame(content_container, fg_color="transparent")
+    nav_frame.pack(fill=tk.X, pady=(0, 10))
+    
+    # Back to Home button - placed at top left
+    back_home_btn = ctk.CTkButton(
+        nav_frame,
+        text="Back to Home",
+        fg_color="white",
+        text_color="#000000",
+        hover_color="#F5F5F5",
+        width=100,
+        height=30,
+        corner_radius=15,
+        font=ctk.CTkFont(size=12, weight="bold")
+    )
+    back_home_btn.pack(side=tk.LEFT)
+
     # Bank icon and app name
     bank_label = ctk.CTkLabel(content_container, text="🏦", font=ctk.CTkFont(size=60))
-    bank_label.pack(pady=(20, 5))
+    bank_label.pack(pady=(5, 5))
     
     app_name_label = ctk.CTkLabel(
         content_container, 
@@ -73,19 +91,11 @@ def create_profile_page(root):
                 image = image.crop((left, top, right, bottom))
                 
                 # Resize to target size (slightly smaller than frame)
-                target_size = (110, 110)
+                target_size = (90, 90)
                 image = image.resize(target_size, Image.Resampling.LANCZOS)
                 
-                # Create circular mask
-                mask = Image.new('L', target_size, 0)
-                from PIL import ImageDraw
-                draw = ImageDraw.Draw(mask)
-                draw.ellipse([0, 0, target_size[0], target_size[1]], fill=255)
-                
-                # Create output image with transparent background
-                output = Image.new('RGBA', target_size, (0, 0, 0, 0))
-                output.paste(image, (0, 0))
-                output.putalpha(mask)
+                # No need for mask since we want a square image
+                output = image
                 
                 # Convert to PhotoImage and update label
                 photo = ImageTk.PhotoImage(output)
@@ -94,12 +104,12 @@ def create_profile_page(root):
             except Exception as e:
                 print(f"Error loading image: {e}")
 
-    # Outer frame for circular background effect
+    # Outer frame for square background effect
     outer_frame = ctk.CTkFrame(
         content_frame,
-        width=140,
-        height=140,
-        corner_radius=70,
+        width=120,
+        height=120,
+        corner_radius=10,
         fg_color="#E8F4FF",
         border_width=2,
         border_color="#D3D3D3"
@@ -107,12 +117,12 @@ def create_profile_page(root):
     outer_frame.pack(pady=10)
     outer_frame.pack_propagate(False)
 
-    # Inner frame for the profile picture with perfect circle shape
+    # Inner frame for the profile picture with square shape
     profile_frame = ctk.CTkFrame(
         outer_frame,
-        width=130,
-        height=130,
-        corner_radius=65,
+        width=110,
+        height=110,
+        corner_radius=8,
         fg_color="#F5F9FF"
     )
     profile_frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
@@ -122,7 +132,7 @@ def create_profile_page(root):
     profile_pic_label = ctk.CTkLabel(
         profile_frame,
         text="👤\nClick to upload",
-        font=ctk.CTkFont(size=30),
+        font=ctk.CTkFont(size=24),
         text_color="#666666"
     )
     profile_pic_label.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
@@ -210,30 +220,13 @@ def create_profile_page(root):
     )
     logout_btn.pack(pady=5)
 
-    # Create a frame for the back button at the bottom
-    back_button_frame = ctk.CTkFrame(main_frame, fg_color="transparent", height=70)
-    back_button_frame.pack(fill=tk.X, side=tk.BOTTOM, pady=(0, 20))
-    back_button_frame.pack_propagate(False)
 
-    # Back to Home button - placed in the green area at bottom
-    back_home_btn = ctk.CTkButton(
-        back_button_frame,
-        text="Back to Home",
-        fg_color="white",
-        text_color="#333333",
-        hover_color="#EAEAEA",
-        width=310,
-        height=35,
-        corner_radius=8,
-        font=ctk.CTkFont(size=14, weight="bold")
-    )
-    back_home_btn.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
 
 if __name__ == "__main__":
     root = ctk.CTk()
     root.title("User Profile")
-    root.geometry("400x750")
+    root.geometry("400x700")
     
     create_profile_page(root)
     
