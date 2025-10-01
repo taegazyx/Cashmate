@@ -35,3 +35,8 @@ ctk.set_default_color_theme("green")
 app = ctk.CTk()
 app.title("CashMate App")
 app.geometry("400x700")
+
+# ---------- ใส่ Background ----------
+bg_image = ctk.CTkImage(light_image=Image.open("bg.jpg"), size=(400, 700))
+bg_label = ctk.CTkLabel(app, image=bg_image, text="")
+bg_label.place(x=0, y=0, relwidth=1, relheight=1)   # ทำให้เต็มหน้าต่าง
