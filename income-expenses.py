@@ -4,6 +4,7 @@ from PIL import Image
 # ---------- Global Variables ----------
 income_amount = 0
 balance_amount = 0
+expenses = {"Food": 0, "Transport": 0, "Entertainment": 0, "Other": 0}
 
 # ---------- Functions ----------
 def set_income():
@@ -67,24 +68,38 @@ income_label = ctk.CTkLabel(income_frame, text="รายรับ (Income) : xx
 income_label.pack(pady=10)
 
 # ---------- ปุ่มหมวดหมู่รายจ่าย -----------
-category_frame = ctk.CTkFrame(app, corner_radius=15)
-category_frame.pack(pady=20, padx=20, fill="both", expand=True)
-btn_food = ctk.CTkButton(category_frame, text="อาหาร\nFood", image=img_food,
-                         font=("Arial", 14), height=120, width=120,
-                         compound="top", command=lambda: add_expense("Food"))
-btn_food.grid(row=0, column=0, padx=10, pady=10)
-btn_transport = ctk.CTkButton(category_frame, text="เดินทาง\nTransport", image=img_transport,
-                              font=("Arial", 14), height=120, width=120,
-                              compound="top", command=lambda: add_expense("Transport"))
-btn_transport.grid(row=0, column=1, padx=10, pady=10)
-btn_entertain = ctk.CTkButton(category_frame, text="บันเทิง\nEntertainment", image=img_entertain,
-                              font=("Arial", 14), height=120, width=120,
-                              compound="top", command=lambda: add_expense("Entertainment"))
-btn_entertain.grid(row=1, column=0, padx=10, pady=10)
-btn_other = ctk.CTkButton(category_frame, text="อื่นๆ\nOther", image=img_other,
-                          font=("Arial", 14), height=120, width=120,
-                          compound="top", command=lambda: add_expense("Other"))
-btn_other.grid(row=1, column=1, padx=10, pady=10)
+# ----------- ปุ่มหมวดหมู่รายจ่าย (จัดให้อยู่ตรงกลาง + โปร่งใส) -----------
+category_frame = ctk.CTkFrame(app, corner_radius=15, fg_color="transparent")
+category_frame.pack(pady=20, padx=20, expand=True)
+
+# ---------- ทำให้ column อยู่กึ่งกลาง -----------
+category_frame.grid_columnconfigure((0, 1), weight=1)
+category_frame.grid_rowconfigure((0, 1), weight=1)
+
+# ----------- สร้าง dictionary เก็บ Label ของยอดแต่ละหมวด -----------
+category_totals = {}
+
+def create_category_button(frame, row, col, text, img, category_name):
+    btn = ctk.CTkButton(frame, text=text, image=img,
+                        font=("Arial", 14), height=100, width=120,
+                        compound="top", command=lambda: add_expense(category_name),
+                        fg_color="transparent", hover_color=("lightgreen"),
+                        text_color="black")  # ตัวหนังสือสีดำ
+    btn.grid(row=row*2, column=col, padx=10, pady=(10, 0), sticky="nsew")
+
+    # ---------- Label แสดงยอดรวม -----------
+    lbl = ctk.CTkLabel(frame, text="รวม: 0 บาท", font=("Arial", 12),
+                       text_color="black", fg_color="transparent")
+    lbl.grid(row=row*2+1, column=col, pady=(5, 15))
+
+    category_totals[category_name] = lbl
+
+
+# ----------- สร้างปุ่ม + label 4 หมวด -----------
+create_category_button(category_frame, 0, 0, "อาหาร\nFood", img_food, "Food")
+create_category_button(category_frame, 0, 1, "เดินทาง\nTransport", img_transport, "Transport")
+create_category_button(category_frame, 1, 0, "บันเทิง\nEntertainment", img_entertain, "Entertainment")
+create_category_button(category_frame, 1, 1, "อื่นๆ\nOther", img_other, "Other")
 
 # ----------- ยอดคงเหลือ -----------
 balance_frame = ctk.CTkFrame(app, corner_radius=15, border_width=1)
