@@ -27,3 +27,11 @@ def add_expense(category):
         print(f"- {category} {amount} Bath (เหลือ {balance_amount} Bath)")
     except (ValueError, TypeError):
         print("❌ ไม่ได้กรอกจำนวนเงินที่ถูกต้อง")
+
+# ---------- UI Setup ----------
+ctk.set_appearance_mode("light")
+ctk.set_default_color_theme("green")
+
+app = ctk.CTk()
+app.title("CashMate App")
+app.geometry("400x700")
