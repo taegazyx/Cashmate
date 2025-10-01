@@ -1,6 +1,8 @@
 import customtkinter as ctk
 import tkinter as tk
 from PIL import Image, ImageTk
+from tkinter import filedialog
+import os
 
 def create_profile_page(root):
     # Set the theme and color scheme
@@ -8,15 +10,19 @@ def create_profile_page(root):
     ctk.set_default_color_theme("green")
 
     # Main frame with mint green background
-    profile_frame = ctk.CTkFrame(root, fg_color="#B2F0C1")
-    profile_frame.pack(fill=tk.BOTH, expand=True)
+    main_frame = ctk.CTkFrame(root, fg_color="#B2F0C1")
+    main_frame.pack(fill=tk.BOTH, expand=True)
+
+    # Content container to help with positioning
+    content_container = ctk.CTkFrame(main_frame, fg_color="transparent")
+    content_container.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
 
     # Bank icon and app name
-    bank_label = ctk.CTkLabel(profile_frame, text="🏦", font=ctk.CTkFont(size=60))
+    bank_label = ctk.CTkLabel(content_container, text="🏦", font=ctk.CTkFont(size=60))
     bank_label.pack(pady=(20, 5))
     
     app_name_label = ctk.CTkLabel(
-        profile_frame, 
+        content_container, 
         text="CashMate App", 
         font=ctk.CTkFont(size=24, weight="bold"),
         text_color="#333333"
@@ -25,7 +31,7 @@ def create_profile_page(root):
 
     # White content frame with rounded corners
     content_frame = ctk.CTkFrame(
-        profile_frame,
+        content_container,
         fg_color="white",
         corner_radius=15,
         border_width=2,
@@ -42,25 +48,97 @@ def create_profile_page(root):
     )
     profile_title.pack(pady=(10, 20))
 
-    # Profile picture frame (circular background)
-    profile_frame = ctk.CTkFrame(
+    def update_profile_picture(image_label):
+        file_path = filedialog.askopenfilename(
+            title="Choose Profile Picture",
+            filetypes=[("Image files", "*.png *.jpg *.jpeg *.gif *.bmp")]
+        )
+        
+        if file_path:
+            try:
+                # Open and resize image
+                image = Image.open(file_path)
+                
+                # Convert to RGBA if needed
+                if image.mode != 'RGBA':
+                    image = image.convert('RGBA')
+                
+                # Make the image square first by cropping to a square
+                width, height = image.size
+                size = min(width, height)
+                left = (width - size) // 2
+                top = (height - size) // 2
+                right = left + size
+                bottom = top + size
+                image = image.crop((left, top, right, bottom))
+                
+                # Resize to target size (slightly smaller than frame)
+                target_size = (110, 110)
+                image = image.resize(target_size, Image.Resampling.LANCZOS)
+                
+                # Create circular mask
+                mask = Image.new('L', target_size, 0)
+                from PIL import ImageDraw
+                draw = ImageDraw.Draw(mask)
+                draw.ellipse([0, 0, target_size[0], target_size[1]], fill=255)
+                
+                # Create output image with transparent background
+                output = Image.new('RGBA', target_size, (0, 0, 0, 0))
+                output.paste(image, (0, 0))
+                output.putalpha(mask)
+                
+                # Convert to PhotoImage and update label
+                photo = ImageTk.PhotoImage(output)
+                image_label.configure(image=photo, text="")
+                image_label.image = photo  # Keep reference
+            except Exception as e:
+                print(f"Error loading image: {e}")
+
+    # Outer frame for circular background effect
+    outer_frame = ctk.CTkFrame(
         content_frame,
-        width=120,
-        height=120,
-        corner_radius=60,
-        fg_color="#E8F4FF"
+        width=140,
+        height=140,
+        corner_radius=70,
+        fg_color="#E8F4FF",
+        border_width=2,
+        border_color="#D3D3D3"
     )
-    profile_frame.pack(pady=10)
+    outer_frame.pack(pady=10)
+    outer_frame.pack_propagate(False)
+
+    # Inner frame for the profile picture with perfect circle shape
+    profile_frame = ctk.CTkFrame(
+        outer_frame,
+        width=130,
+        height=130,
+        corner_radius=65,
+        fg_color="#F5F9FF"
+    )
+    profile_frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
     profile_frame.pack_propagate(False)
 
-    # Add a simple avatar label inside the circular frame
-    avatar_label = ctk.CTkLabel(
+    # Create a label for the profile picture that acts as a button
+    profile_pic_label = ctk.CTkLabel(
         profile_frame,
-        text="👤",
-        font=ctk.CTkFont(size=50),
+        text="👤\nClick to upload",
+        font=ctk.CTkFont(size=30),
         text_color="#666666"
     )
-    avatar_label.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+    profile_pic_label.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+    
+    # Bind click event to the label
+    profile_pic_label.bind("<Button-1>", lambda e: update_profile_picture(profile_pic_label))
+    
+    # Make the label look clickable
+    def on_enter(e):
+        profile_pic_label.configure(text_color="#333333")
+    def on_leave(e):
+        profile_pic_label.configure(text_color="#666666")
+        
+    profile_pic_label.bind("<Enter>", on_enter)
+    profile_pic_label.bind("<Leave>", on_leave)
+    profile_frame.bind("<Button-1>", lambda e: update_profile_picture(profile_pic_label))
 
     # User information
     name_label = ctk.CTkLabel(
@@ -132,18 +210,24 @@ def create_profile_page(root):
     )
     logout_btn.pack(pady=5)
 
-    # Back to Home button
+    # Create a frame for the back button at the bottom
+    back_button_frame = ctk.CTkFrame(main_frame, fg_color="transparent", height=70)
+    back_button_frame.pack(fill=tk.X, side=tk.BOTTOM, pady=(0, 20))
+    back_button_frame.pack_propagate(False)
+
+    # Back to Home button - placed in the green area at bottom
     back_home_btn = ctk.CTkButton(
-        content_frame,
+        back_button_frame,
         text="Back to Home",
-        fg_color="#666666",
-        hover_color="#4D4D4D",
+        fg_color="white",
+        text_color="#333333",
+        hover_color="#EAEAEA",
         width=310,
         height=35,
         corner_radius=8,
-        font=ctk.CTkFont(size=14)
+        font=ctk.CTkFont(size=14, weight="bold")
     )
-    back_home_btn.pack(pady=15)
+    back_home_btn.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
 
 if __name__ == "__main__":
