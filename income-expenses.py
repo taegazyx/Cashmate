@@ -40,3 +40,11 @@ app.geometry("400x700")
 bg_image = ctk.CTkImage(light_image=Image.open("bg.jpg"), size=(400, 700))
 bg_label = ctk.CTkLabel(app, image=bg_image, text="")
 bg_label.place(x=0, y=0, relwidth=1, relheight=1)   # ทำให้เต็มหน้าต่าง
+
+# ---------- โหลดไอคอน----------
+img_bank = ctk.CTkImage(light_image=Image.open("bank.jpg"), size=(60, 60))
+img_food = ctk.CTkImage(light_image=Image.open("food.jpg"), size=(60, 60))
+img_transport = ctk.CTkImage(light_image=Image.open("transport.jpg"), size=(60, 60))
+img_entertain = ctk.CTkImage(light_image=Image.open("entertainment.jpg"), size=(60, 60))
+img_other = ctk.CTkImage(light_image=Image.open("other.jpg"), size=(60, 60))
+img_balance = ctk.CTkImage(light_image=Image.open("balance.jpg"), size=(40, 40))
