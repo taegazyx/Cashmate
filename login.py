@@ -3,6 +3,7 @@ from tkinter import messagebox
 from PIL import Image, ImageTk
 
 def login_action():
+    #DB connect and verify username and password here
     username = username_entry.get()
     password = password_entry.get()
 
