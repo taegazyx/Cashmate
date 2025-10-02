@@ -4,13 +4,20 @@ from PIL import Image, ImageTk
 from tkinter import filedialog
 import os
 
+def open_edit_profile():
+    root.destroy()  # Close current window
+    import Edit_Profile
+    new_window = ctk.CTk()
+    Edit_Profile.create_edit_profile_page(new_window)
+    new_window.mainloop()
+
 def create_profile_page(root):
     # Set the theme and color scheme
     ctk.set_appearance_mode("light")
     ctk.set_default_color_theme("green")
 
-    # Main frame with mint green background
-    main_frame = ctk.CTkFrame(root, fg_color="#B2F0C1")
+    # Main frame with green background
+    main_frame = ctk.CTkFrame(root, fg_color="#B2F0C1")  # Medium green color
     main_frame.pack(fill=tk.BOTH, expand=True)
 
     # Content container to help with positioning
@@ -36,7 +43,13 @@ def create_profile_page(root):
     back_home_btn.pack(side=tk.LEFT)
 
     # Bank icon and app name
-    bank_label = ctk.CTkLabel(content_container, text="🏦", font=ctk.CTkFont(size=60))
+    # Load and resize bank icon
+    bank_image = Image.open("bank_icon.png")
+    bank_image = bank_image.resize((90, 90))  # Resize to match previous emoji size
+    bank_photo = ImageTk.PhotoImage(bank_image)
+    
+    bank_label = ctk.CTkLabel(content_container, text="", image=bank_photo)
+    bank_label.image = bank_photo  # Keep a reference
     bank_label.pack(pady=(5, 5))
     
     app_name_label = ctk.CTkLabel(
@@ -179,6 +192,7 @@ def create_profile_page(root):
         text="Edit Profile",
         fg_color="#666666",
         hover_color="#4D4D4D",
+        command=open_edit_profile,  # Add command to open Edit Profile page
         **button_style
     )
     edit_profile_btn.pack(side=tk.LEFT, padx=5)
@@ -213,7 +227,7 @@ def create_profile_page(root):
         text="Logout",
         fg_color="#666666",
         hover_color="#4D4D4D",
-        width=310,
+        width=120,
         height=35,
         corner_radius=8,
         font=ctk.CTkFont(size=14)
