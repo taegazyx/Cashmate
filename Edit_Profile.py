@@ -4,14 +4,7 @@ from PIL import Image, ImageTk
 from tkinter import filedialog
 import os
 
-def open_edit_profile():
-    root.destroy()  # Close current window
-    import Edit_Profile
-    new_window = ctk.CTk()
-    Edit_Profile.create_edit_profile_page(new_window)
-    new_window.mainloop()
-
-def create_profile_page(root):
+def create_edit_profile_page(root):
     # Set the theme and color scheme
     ctk.set_appearance_mode("light")
     ctk.set_default_color_theme("green")
@@ -43,13 +36,14 @@ def create_profile_page(root):
     back_home_btn.pack(side=tk.LEFT)
 
     # Bank icon and app name
-    # Load and resize bank icon
-    bank_image = Image.open("bank_icon.png")
-    bank_image = bank_image.resize((90, 90))  # Resize to match previous emoji size
-    bank_photo = ImageTk.PhotoImage(bank_image)
-    
-    bank_label = ctk.CTkLabel(content_container, text="", image=bank_photo)
-    bank_label.image = bank_photo  # Keep a reference
+    try:
+        bank_image = Image.open("bank_icon.png")
+        bank_image = bank_image.resize((90, 90))
+        bank_photo = ImageTk.PhotoImage(bank_image)
+        bank_label = ctk.CTkLabel(content_container, text="", image=bank_photo)
+        bank_label.image = bank_photo
+    except FileNotFoundError:
+        bank_label = ctk.CTkLabel(content_container, text="🏦", font=ctk.CTkFont(size=72))
     bank_label.pack(pady=(5, 5))
     
     app_name_label = ctk.CTkLabel(
@@ -70,10 +64,10 @@ def create_profile_page(root):
     )
     content_frame.pack(pady=20, padx=20, ipadx=20, ipady=20)
 
-    # User Profile heading
+    # Edit Profile heading
     profile_title = ctk.CTkLabel(
         content_frame,
-        text="User Profile",
+        text="Edit Profile",
         font=ctk.CTkFont(size=28, weight="bold"),
         text_color="#333333"
     )
@@ -87,14 +81,10 @@ def create_profile_page(root):
         
         if file_path:
             try:
-                # Open and resize image
                 image = Image.open(file_path)
-                
-                # Convert to RGBA if needed
                 if image.mode != 'RGBA':
                     image = image.convert('RGBA')
                 
-                # Make the image square first by cropping to a square
                 width, height = image.size
                 size = min(width, height)
                 left = (width - size) // 2
@@ -103,17 +93,13 @@ def create_profile_page(root):
                 bottom = top + size
                 image = image.crop((left, top, right, bottom))
                 
-                # Resize to target size (slightly smaller than frame)
                 target_size = (90, 90)
                 image = image.resize(target_size, Image.Resampling.LANCZOS)
                 
-                # No need for mask since we want a square image
                 output = image
-                
-                # Convert to PhotoImage and update label
                 photo = ImageTk.PhotoImage(output)
                 image_label.configure(image=photo, text="")
-                image_label.image = photo  # Keep reference
+                image_label.image = photo
             except Exception as e:
                 print(f"Error loading image: {e}")
 
@@ -150,98 +136,72 @@ def create_profile_page(root):
     )
     profile_pic_label.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
     
-    # Bind click event to the label
     profile_pic_label.bind("<Button-1>", lambda e: update_profile_picture(profile_pic_label))
     
-    # Make the label look clickable
     def on_enter(e):
         profile_pic_label.configure(text_color="#333333")
     def on_leave(e):
         profile_pic_label.configure(text_color="#666666")
-        
+    
     profile_pic_label.bind("<Enter>", on_enter)
     profile_pic_label.bind("<Leave>", on_leave)
     profile_frame.bind("<Button-1>", lambda e: update_profile_picture(profile_pic_label))
 
-    # User information
-    name_label = ctk.CTkLabel(
+    # User information entry fields
+    entry_style = {"font": ctk.CTkFont(size=14), "width": 300, "height": 35, "corner_radius": 8}
+    
+    # Name
+    name_entry = ctk.CTkEntry(content_frame, placeholder_text="Name", **entry_style)
+    name_entry.pack(pady=(10, 5))
+    name_entry.insert(0, "User Name") # Pre-fill with a placeholder name
+
+    # Email
+    email_entry = ctk.CTkEntry(content_frame, placeholder_text="Email", **entry_style)
+    email_entry.pack(pady=5)
+    email_entry.insert(0, "xxx@gmail.com") # Pre-fill with a placeholder email
+    
+    # Phone Number
+    phone_entry = ctk.CTkEntry(content_frame, placeholder_text="Phone Number", **entry_style)
+    phone_entry.pack(pady=5)
+    
+    # Address
+    address_entry = ctk.CTkEntry(content_frame, placeholder_text="Address", **entry_style)
+    address_entry.pack(pady=5)
+
+    # Save Changes button
+    def save_changes():
+        # This function would contain the logic to save the updated user information
+        # For this example, we'll just print the new data.
+        name = name_entry.get()
+        email = email_entry.get()
+        phone = phone_entry.get()
+        address = address_entry.get()
+        
+        print(f"Saving changes...")
+        print(f"Name: {name}")
+        print(f"Email: {email}")
+        print(f"Phone: {phone}")
+        print(f"Address: {address}")
+
+    save_btn = ctk.CTkButton(
         content_frame,
-        text="Name :",
-        font=ctk.CTkFont(size=16),
-        text_color="#666666"
+        text="Save Changes",
+        fg_color="#4CAF50",
+        hover_color="#45a049",
+        width=200,
+        height=40,
+        corner_radius=10,
+        font=ctk.CTkFont(size=16, weight="bold"),
+        command=save_changes
     )
-    name_label.pack(pady=(20, 5))
+    save_btn.pack(pady=(20, 10))
 
-    email_label = ctk.CTkLabel(
-        content_frame,
-        text="Email : xxx@gmail.com",
-        font=ctk.CTkFont(size=16),
-        text_color="#666666"
-    )
-    email_label.pack(pady=(0, 20))
-
-    # Buttons
-    button_style = {"width": 150, "height": 35, "corner_radius": 8, "font": ctk.CTkFont(size=14)}
-    
-    # First row of buttons
-    button_frame1 = ctk.CTkFrame(content_frame, fg_color="transparent")
-    button_frame1.pack(pady=5)
-    
-    edit_profile_btn = ctk.CTkButton(
-        button_frame1,
-        text="Edit Profile",
-        fg_color="#666666",
-        hover_color="#4D4D4D",
-        command=open_edit_profile,  # Add command to open Edit Profile page
-        **button_style
-    )
-    edit_profile_btn.pack(side=tk.LEFT, padx=5)
-    
-    change_pass_btn = ctk.CTkButton(
-        button_frame1,
-        text="Change Password",
-        fg_color="#666666",
-        hover_color="#4D4D4D",
-        **button_style
-    )
-    change_pass_btn.pack(side=tk.LEFT, padx=5)
-
-    # Second row of buttons
-    button_frame2 = ctk.CTkFrame(content_frame, fg_color="transparent")
-    button_frame2.pack(pady=5)
-    
-    privacy_btn = ctk.CTkButton(
-        button_frame2,
-        text="Privacy & Policy / How to Use",
-        fg_color="#666666",
-        hover_color="#4D4D4D",
-        width=310,
-        height=35,
-        corner_radius=8,
-        font=ctk.CTkFont(size=14)
-    )
-    privacy_btn.pack(pady=5)
-    
-    logout_btn = ctk.CTkButton(
-        button_frame2,
-        text="Logout",
-        fg_color="#666666",
-        hover_color="#4D4D4D",
-        width=120,
-        height=35,
-        corner_radius=8,
-        font=ctk.CTkFont(size=14)
-    )
-    logout_btn.pack(pady=5)
-
-
-
-
+# Main application window setup
 if __name__ == "__main__":
     root = ctk.CTk()
-    root.title("User Profile")
+    root.title("Edit Profile")
     root.geometry("400x700")
     
-    create_profile_page(root)
+    create_edit_profile_page(root)
     
     root.mainloop()
