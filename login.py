@@ -19,6 +19,7 @@ root.geometry("400x700")# <----- App Size
 canvas = tk.Canvas(root, width=400, height=700, highlightthickness=0, bd=0)
 canvas.pack(fill="both", expand=True)
 
+
 #UserName Entry and Label
 canvas.create_text(80, 260, text="Username",        
                    font=("Arial", 12, "bold"),               # <----- User Name in Login Page
@@ -41,6 +42,17 @@ password_entry = tk.Entry(root, font=("Arial", 14), width=25, show="*",     # <-
                           relief="flat", bg="#e0e0e0", fg="black",
                           insertbackground="black")
 canvas.create_window(200, 355, window=password_entry)
+
+
+
+#Login Button
+login_button = tk.Button(root, text="Log in", font=("Arial", 14, "bold"),
+                         bg="#5ec57e", fg="white",
+                         command=login_action,
+                         relief="flat", activebackground="#4C704E", activeforeground="white")
+canvas.create_window(200, 420, window=login_button)
+
+
 
 username_entry.focus_set()
 root.bind("<Return>", lambda e: login_button.invoke())
