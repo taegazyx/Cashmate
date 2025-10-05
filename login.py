@@ -16,8 +16,27 @@ root = tk.Tk()
 root.title("CashMate App Login") # <----- App Name
 root.geometry("400x700")# <----- App Size
 
+icon_img = ImageTk.PhotoImage(file="bg.png") # <----- App Icon
+root.iconphoto(False, icon_img)
+
 canvas = tk.Canvas(root, width=400, height=700, highlightthickness=0, bd=0)
 canvas.pack(fill="both", expand=True)
+
+bg_img = Image.open("BG2.png").resize((400, 700)) # <----- Background Image 
+bg = ImageTk.PhotoImage(bg_img)
+canvas.create_image(0, 0, image=bg, anchor="nw")
+
+try:
+    logo_img = Image.open("KMITL LOGO.png").resize((150, 150)) # <----- Logo Image
+    logo = ImageTk.PhotoImage(logo_img)
+    canvas.create_image(200, 100, image=logo)
+except FileNotFoundError:
+    canvas.create_text(200, 100, text="[Logo Missing]", fill="grey", font=("Arial", 14))
+
+canvas.create_text(200, 200, text="CashMate App",       
+                   font=("Arial", 24, "bold"), fill="#000000") # <----- App Name in Login Page
+
+
 
 
 #UserName Entry and Label
