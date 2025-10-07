@@ -4,6 +4,13 @@ from PIL import Image, ImageTk
 from tkinter import filedialog
 import os
 
+def back_to_profile():
+    root.destroy()  # Close current window
+    import Profile
+    new_window = ctk.CTk()
+    Profile.create_profile_page(new_window)
+    new_window.mainloop()
+
 def create_edit_profile_page(root):
     # Set the theme and color scheme
     ctk.set_appearance_mode("light")
@@ -31,7 +38,8 @@ def create_edit_profile_page(root):
         width=100,
         height=30,
         corner_radius=15,
-        font=ctk.CTkFont(size=12, weight="bold")
+        font=ctk.CTkFont(size=12, weight="bold"),
+        command=back_to_profile  # Add command to go back to profile page
     )
     back_home_btn.pack(side=tk.LEFT)
 

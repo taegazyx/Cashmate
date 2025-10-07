@@ -187,7 +187,7 @@ def create_profile_page(root):
     button_frame1 = ctk.CTkFrame(content_frame, fg_color="transparent")
     button_frame1.pack(pady=5)
     
-    edit_profile_btn = ctk.CTkButton(
+    edit_profile_btn = ctk.CTkButton(    
         button_frame1,
         text="Edit Profile",
         fg_color="#666666",
