@@ -11,6 +11,13 @@ def open_edit_profile():
     Edit_Profile.create_edit_profile_page(new_window)
     new_window.mainloop()
 
+def open_change_password():
+    root.destroy()  # Close current window
+    import change_password
+    new_window = ctk.CTk()
+    change_password.create_change_password_page(new_window)
+    new_window.mainloop()
+
 def create_profile_page(root):
     # Set the theme and color scheme
     ctk.set_appearance_mode("light")
@@ -202,6 +209,7 @@ def create_profile_page(root):
         text="Change Password",
         fg_color="#666666",
         hover_color="#4D4D4D",
+        command=open_change_password,  # Add command to open Change Password page
         **button_style
     )
     change_pass_btn.pack(side=tk.LEFT, padx=5)
