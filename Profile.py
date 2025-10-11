@@ -218,6 +218,13 @@ def create_profile_page(root):
     button_frame2 = ctk.CTkFrame(content_frame, fg_color="transparent")
     button_frame2.pack(pady=5)
     
+    def open_privacy_policy():
+        root.destroy()  # Close current window
+        import privacy_policy
+        new_window = ctk.CTk()
+        privacy_policy.create_privacy_page(new_window)
+        new_window.mainloop()
+
     privacy_btn = ctk.CTkButton(
         button_frame2,
         text="Privacy & Policy / How to Use",
@@ -226,7 +233,8 @@ def create_profile_page(root):
         width=310,
         height=35,
         corner_radius=8,
-        font=ctk.CTkFont(size=14)
+        font=ctk.CTkFont(size=14),
+        command=open_privacy_policy
     )
     privacy_btn.pack(pady=5)
     

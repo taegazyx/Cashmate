@@ -30,7 +30,7 @@ def create_change_password_page(root):
     # Back to Home button - placed at top left
     back_home_btn = ctk.CTkButton(
         nav_frame,
-        text="Back to Home",
+        text="Back",
         fg_color="white",
         text_color="#000000",
         hover_color="#F5F5F5",
