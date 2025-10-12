@@ -3,3 +3,4 @@ customtkinter
 Pillow
 mysql-connector-python
 bcrypt
+plyer
