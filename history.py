@@ -20,12 +20,11 @@ ctk.set_default_color_theme("green")
 
 # --- Database Configuration (กำหนดค่าการเชื่อมต่อ MariaDB) ---
 DB_CONFIG = {
-    'host': '127.0.0.1',      # อัปเดตตามข้อมูลที่ระบุ
-    'user': 'root',           # อัปเดตตามข้อมูลที่ระบุ
-    'password': '25849',      # อัปเดตตามข้อมูลที่ระบุ
-    'database': 'cashmate_db'  # อัปเดตตามข้อมูลที่ระบุ
+    'host': '127.0.0.1',      
+    'user': 'root',           
+    'password': '25849',      
+    'database': 'cashmate_db'  
 }
-MOCK_BALANCE = 0.00 
 TODAY_DATE_STR = datetime.date.today().strftime("%Y-%m-%d")
 
 
@@ -48,7 +47,6 @@ def setup_database_structure():
     cursor = conn.cursor()
     
     try:
-        # สร้างตาราง Transactions
         cursor.execute(f"""
             CREATE TABLE IF NOT EXISTS transactions (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -69,14 +67,25 @@ def setup_database_structure():
 
 
 def get_cumulative_balance():
-    """ดึงยอดรวม (SUM) ของคอลัมน์ amount จากทุกรายการในฐานข้อมูล"""
+    """
+    ดึงยอดรวม (SUM) ของคอลัมน์ amount จากทุกรายการในฐานข้อมูล (Net Balance) 
+    โดยใช้ CASE WHEN เพื่อแปลง Expense ที่อาจถูกบันทึกเป็นบวกให้เป็นลบก่อนรวมยอด
+    """
     balance = 0.00
     conn = get_db_connection()
     cursor = conn.cursor()
     
     try:
-        # SQL query เพื่อรวมยอดทั้งหมด
-        sql_query = "SELECT SUM(amount) FROM transactions"
+        # แก้ไข SQL Query เพื่อบังคับให้ Expense เป็นลบก่อนรวมยอด
+        sql_query = """
+            SELECT SUM(
+                CASE 
+                    WHEN type IN ('expense', 'Expense') AND amount > 0 
+                    THEN -amount 
+                    ELSE amount 
+                END
+            ) FROM transactions
+        """
         cursor.execute(sql_query)
         result = cursor.fetchone()
         
@@ -94,7 +103,7 @@ def get_cumulative_balance():
 
 
 def get_transactions_by_date(selected_date):
-    """ดึงข้อมูลธุรกรรมจากฐานข้อมูล MariaDB ตามวันที่ที่เลือก"""
+    """ดึงข้อมูลธุรกรรมจากฐานข้อมูล MariaDB พร้อมปรับค่า Expense เป็นลบสำหรับการแสดงผล"""
     transactions_list = []
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -105,11 +114,18 @@ def get_transactions_by_date(selected_date):
         rows = cursor.fetchall()
         
         for row in rows:
+            amount_value = float(row[2])
+            transaction_type = row[3]
+            
+            # การแก้ไข: แปลง amount เป็นค่าลบ ถ้าเป็น Expense และยังเป็นค่าบวกอยู่ (สำหรับแสดงผล)
+            if transaction_type and transaction_type.lower() == 'expense' and amount_value > 0:
+                 amount_value = -amount_value 
+            
             transactions_list.append({
                 "date": row[0].strftime("%Y-%m-%d"), 
                 "desc": row[1],
-                "amount": float(row[2]),            
-                "type": row[3]
+                "amount": amount_value,            
+                "type": transaction_type
             })
             
     except mysql.connector.Error as err:
@@ -126,7 +142,7 @@ setup_database_structure()
 
 
 def calculate_balance():
-    """ดึงยอดคงเหลือทั้งหมดจากฐานข้อมูล"""
+    """ดึงยอดคงเหลือสุทธิทั้งหมดจากฐานข้อมูล"""
     return get_cumulative_balance()
 
 def back_action():
@@ -136,7 +152,7 @@ def back_action():
 
 # --- UI Setup ---
 root = ctk.CTk()
-root.title("CashMate History - Connected to MariaDB")
+root.title("CashMate History - Connected to MariaDB (Scrollable)")
 root.geometry("900x600")
 root.resizable(False, False)
 
@@ -150,6 +166,8 @@ EXPENSE_RED = "#cc0000"
 
 # --- Background Image Setup ---
 try:
+    # NOTE: You need to have 'BG2.png' and 'bank.png' files in the same directory
+    # หากไม่มีไฟล์ ให้ใช้สีพื้นฐานแทน
     bg_img = Image.open("BG2.png").resize((900, 600))
     bg_photo_image = ImageTk.PhotoImage(bg_img)
     bg_label = tk.Label(root._w, image=bg_photo_image)
@@ -244,13 +262,16 @@ else:
     date_entry.insert(0, TODAY_DATE_STR)
     date_entry.grid(row=0, column=2, sticky="e")
 
-# 6. Transaction Items Container (with filter)
-tx_container = ctk.CTkFrame(main_container, fg_color="transparent")
-tx_container.place(relx=0.5, y=395, anchor="n", relwidth=0.9)
+# 6. Transaction Items Container (with SCROLLBAR)
+tx_container = ctk.CTkScrollableFrame(main_container, fg_color="transparent", 
+                                       label_text="", height=180) 
+tx_container.place(relx=0.5, y=395, anchor="n", relwidth=0.9) 
+
 
 def create_transaction_item(parent_frame, transaction):
     amount = transaction['amount']
-    amount_text = f"{amount:+,.2f}"
+    # การแสดงผล: ใช้ :+ เพื่อให้แสดงเครื่องหมาย + สำหรับ Income และ - สำหรับ Expense
+    amount_text = f"{amount:+,.2f}" 
     color = INCOME_GREEN if amount > 0 else EXPENSE_RED
     
     item_frame = ctk.CTkFrame(parent_frame, fg_color="transparent", height=50)
@@ -277,7 +298,7 @@ def create_transaction_item(parent_frame, transaction):
     amount_label.grid(row=0, column=2, sticky="e", padx=5, rowspan=2)
 
 def update_transaction_list(selected_date):
-    """ดึงข้อมูลธุรกรรมจากฐานข้อมูล MariaDB และแสดงผล"""
+    """ดึงข้อมูลธุรกรรมจากฐานข้อมูล MariaDB และแสดงผลใน Scrollable Frame"""
     for widget in tx_container.winfo_children():
         widget.destroy()
         
@@ -295,6 +316,12 @@ def on_date_change(event=None):
         date = date_entry.get_date().strftime("%Y-%m-%d")
     else:
         date = date_entry.get()
+    
+    # อัพเดทยอดคงเหลือสุทธิ
+    global BALANCE
+    BALANCE = calculate_balance()
+    balance_frame.winfo_children()[-1].configure(text=f"{BALANCE:,.2f} THB") # อัพเดท label ยอดคงเหลือ
+    
     update_transaction_list(date)
 
 # Bind the date entry to the update function
