@@ -1,11 +1,10 @@
-# page_add.py
+# page_add.py (ฉบับแก้ไขสมบูรณ์)
 import customtkinter as ctk
 from tkinter import messagebox
 from PIL import Image
 
-# --- คลาส ExpenseDialog (เหมือนเดิม ไม่ต้องแก้ไข) ---
 class ExpenseDialog(ctk.CTkToplevel):
-    # ... (โค้ดส่วนนี้ถูกต้องอยู่แล้ว) ...
+    # ... (โค้ดส่วนนี้ถูกต้องอยู่แล้ว ไม่ต้องแก้ไข) ...
     def __init__(self, master, category, callback):
         super().__init__(master)
         self.category = category
@@ -49,38 +48,27 @@ class ExpenseDialog(ctk.CTkToplevel):
             messagebox.showerror("Error", "Invalid amount format. Please enter numbers only.")
             self.amount_entry.delete(0, 'end')
 
-
-# --- คลาสหลักสำหรับหน้า Add Income/Expense ---
 class AddPage:
     def __init__(self, parent, main_app):
         self.parent = parent
         self.main_app = main_app 
-        
-        # --- ค่าคงที่สำหรับ UI ---
         self.CARD_BG_COLOR = "#FFFFFF"
         self.BUTTON_COLOR = "#10B981"
         self.ACCENT_COLOR = "#059669"
-        
         self.categories = [
             {"name": "Food", "label": "Food"},
             {"name": "Transport", "label": "Transport"},
             {"name": "Entertainment", "label": "Entertainment"},
             {"name": "Other", "label": "Other"}
         ]
-        
-        # <--- 1. โหลดรูปภาพทั้งหมดที่ต้องใช้ ---
         self.load_images()
-        
         self.frame = ctk.CTkFrame(parent, fg_color="#C6F6D8")
         self.frame.pack(fill="both", expand=True)
         self.frame.grid_columnconfigure(0, weight=1)
-
         self.setup_ui()
         self.update_display()
 
-    # <--- 2. เพิ่มเมธอดสำหรับโหลดรูปภาพ ---
     def _safe_load_image(self, filepath, size):
-        """Safely loads an image and returns a CTkImage, or a placeholder on failure."""
         try:
             img_content = Image.open(filepath)
             return ctk.CTkImage(light_image=img_content, size=size)
@@ -90,7 +78,6 @@ class AddPage:
             return ctk.CTkImage(light_image=dummy_image, size=size)
             
     def load_images(self):
-        """Loads all necessary images for the UI."""
         self.icon_images = {
             "Food": self._safe_load_image("food.png", size=(60, 60)), 
             "Transport": self._safe_load_image("transport.png", size=(60, 60)),
@@ -98,15 +85,15 @@ class AddPage:
             "Other": self._safe_load_image("other.png", size=(60, 60)),
         }
 
-    # --- เมธอดอื่นๆ (เหมือนเดิม) ---
+    # <--- 1. แก้ไข open_set_income_dialog ให้เรียก add_income ---
     def open_set_income_dialog(self, event=None):
-        # ... (โค้ดส่วนนี้เหมือนเดิม) ...
         dialog = ctk.CTkInputDialog(text="Enter your income amount (THB):", title="Set Income")
         amount_str = dialog.get_input()
         try:
             amount = int(str(amount_str).replace(',', ''))
             if amount >= 0:
-                self.main_app.set_income(amount)
+                # --- เปลี่ยนมาเรียก add_income เพื่อให้บันทึกเป็นรายการ ---
+                self.main_app.add_income(amount, description="Manual Income")
             else:
                 messagebox.showwarning("Input Error", "Income must be a positive number.")
         except (ValueError, TypeError):
@@ -119,19 +106,22 @@ class AddPage:
     def add_expense(self, category):
         ExpenseDialog(self.frame, category, self.process_expense)
 
+    # <--- 2. แก้ไข update_display ให้คำนวณ income จาก list ---
     def update_display(self):
-        income_display = f"{self.main_app.income:,.0f} THB"
+        """Updates the labels by getting the latest data from main_app."""
+        # --- คำนวณยอดรวมรายรับจาก self.transactions ---
+        total_income = sum(t['amount'] for t in self.main_app.transactions if t.get('type') == 'Income')
+        income_display = f"{total_income:,.0f} THB"
         balance_display = f"{self.main_app.calculate_balance():,.0f} THB"
+        
         if hasattr(self, 'income_amount_label'): self.income_amount_label.configure(text=income_display)
         if hasattr(self, 'balance_amount_label'): self.balance_amount_label.configure(text=balance_display)
 
     def setup_ui(self):
-        # --- Header ---
+        # ... (โค้ด UI ทั้งหมดของคุณถูกต้องอยู่แล้ว ไม่ต้องแก้ไข) ...
         header_frame = ctk.CTkFrame(self.frame, fg_color="transparent")
         header_frame.pack(fill="x", pady=(15, 15))
         ctk.CTkLabel(header_frame, text="CashMate App", font=("Arial Rounded MT Bold", 22)).pack()
-
-        # --- Income Card ---
         income_card_frame = ctk.CTkFrame(self.frame, corner_radius=15, fg_color=self.CARD_BG_COLOR, height=80, border_color="#34D399", border_width=2)
         income_card_frame.pack(fill="x", padx=20)
         income_card_frame.bind("<Button-1>", self.open_set_income_dialog)
@@ -139,30 +129,13 @@ class AddPage:
         ctk.CTkLabel(income_card_frame, text="Income:", font=("Arial", 16)).grid(row=0, column=0, padx=20, pady=20, sticky="w")
         self.income_amount_label = ctk.CTkLabel(income_card_frame, text="0 THB", font=("Arial Rounded MT Bold", 20))
         self.income_amount_label.grid(row=0, column=1, padx=20, pady=20, sticky="e")
-
-        # --- Scrollable Area ---
         scroll_frame = ctk.CTkScrollableFrame(self.frame, fg_color="transparent")
         scroll_frame.pack(fill="both", expand=True, padx=20, pady=10)
         scroll_frame.grid_columnconfigure((0,1), weight=1)
-
-        # --- Category Buttons ---
         for idx, cat in enumerate(self.categories):
             row, col = divmod(idx, 2)
-            btn = ctk.CTkButton(
-                scroll_frame, 
-                text=cat['label'], 
-                # <--- 3. นำรูปภาพที่โหลดไว้มาใช้งาน ---
-                image=self.icon_images.get(cat["name"]),
-                compound="top", # ทำให้รูปอยู่บนข้อความ
-                font=("Arial", 14), 
-                height=130, 
-                command=lambda c=cat["name"]: self.add_expense(c), 
-                fg_color=self.BUTTON_COLOR,
-                hover_color=self.ACCENT_COLOR
-            )
+            btn = ctk.CTkButton(scroll_frame, text=cat['label'], image=self.icon_images.get(cat["name"]), compound="top", font=("Arial", 14), height=130, command=lambda c=cat["name"]: self.add_expense(c), fg_color=self.BUTTON_COLOR, hover_color=self.ACCENT_COLOR)
             btn.grid(row=row, column=col, padx=10, pady=10, sticky="nsew")
-
-        # --- Balance Card ---
         balance_card_frame = ctk.CTkFrame(scroll_frame, corner_radius=15, fg_color=self.CARD_BG_COLOR, height=80, border_color="#34D399", border_width=2)
         balance_card_frame.grid(row=(len(self.categories)//2), column=0, columnspan=2, pady=15, padx=10, sticky="ew")
         balance_card_frame.grid_columnconfigure(1, weight=1)

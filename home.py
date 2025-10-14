@@ -1,4 +1,4 @@
-# main_app.py (ฉบับสมบูรณ์พร้อมระบบแจ้งเตือน)
+# main_app.py (ฉบับสมบูรณ์)
 import customtkinter as ctk
 from tkinter import messagebox
 
@@ -8,7 +8,7 @@ from page_profile import ProfilePage
 from page_add import AddPage
 from page_dashboard import DashboardPage
 
-# <--- 1. Import ฟังก์ชันแจ้งเตือนเข้ามา ---
+# --- Import ฟังก์ชันแจ้งเตือนเข้ามา ---
 from finance_notifier import notify_income, notify_expense
 
 class App(ctk.CTk):
@@ -17,44 +17,62 @@ class App(ctk.CTk):
         self.geometry("900x600")
         self.resizable(0, 0)
         self.title("CASHMATH")
-        self.income = 0.0
-        self.transactions = []
+
+        # --- "ฐานข้อมูลชั่วคราว" ในแอป ---
+        # self.income = 0.0 # <--- เราจะไม่ใช้ตัวแปรนี้แล้ว
+        self.transactions = [] # <--- เก็บทุกอย่างทั้งรายรับและรายจ่าย
+
         self.create_main_app_view()
 
     def add_expense(self, category, amount, description):
         """เมธอดสำหรับเพิ่มรายจ่าย"""
-        transaction_data = {"category": category, "amount": float(amount), "desc": description}
+        transaction_data = {
+            "type": "Expense", # <--- เพิ่มประเภท
+            "category": category,
+            "amount": float(amount),
+            "desc": description
+        }
         self.transactions.append(transaction_data)
         
-        # <--- 2. ยิงแจ้งเตือนหลังจากบันทึกข้อมูล! ---
+        # --- ยิงแจ้งเตือนหลังจากบันทึก (ส่ง description ไปเป็น note) ---
         current_balance = self.calculate_balance()
-        notify_expense(amount=float(amount), category=category, balance=current_balance)
-
-        # รีเฟรชหน้าจอ (เหมือนเดิม)
+        notify_expense(
+            amount=float(amount), 
+            category=category, 
+            note=description, # <--- ส่ง description ไปด้วย
+            balance=current_balance
+        )
+        
         self.create_main_app_view()
 
-    def set_income(self, amount):
-        """เมธอดสำหรับตั้งค่ารายรับ"""
-        self.income = float(amount)
+    # <--- เปลี่ยนจาก set_income เป็น add_income ---
+    def add_income(self, amount, description="Income"):
+        """เมธอดสำหรับเพิ่มรายรับ"""
+        transaction_data = {
+            "type": "Income", # <--- เพิ่มประเภท
+            "category": "Income", # กำหนดหมวดหมู่พื้นฐาน
+            "amount": float(amount),
+            "desc": description
+        }
+        self.transactions.append(transaction_data)
 
-        # <--- 3. ยิงแจ้งเตือนหลังจากบันทึกข้อมูล! ---
+        # --- ยิงแจ้งเตือนหลังจากบันทึก ---
         current_balance = self.calculate_balance()
         notify_income(amount=float(amount), balance=current_balance)
         
-        # รีเฟรชหน้าจอ (เหมือนเดิม)
         self.create_main_app_view()
 
+    # <--- แก้ไข calculate_balance ให้คำนวณจาก list ทั้งหมด ---
     def calculate_balance(self):
-        """คำนวณยอดคงเหลือ"""
-        total_expense = sum(t['amount'] for t in self.transactions)
-        return self.income - total_expense
+        """คำนวณยอดคงเหลือจาก transactions ทั้งหมด"""
+        total_income = sum(t['amount'] for t in self.transactions if t.get('type') == 'Income')
+        total_expense = sum(t['amount'] for t in self.transactions if t.get('type') == 'Expense')
+        return total_income - total_expense
 
     def get_recent_transactions(self, count=5):
-        """ดึงรายการล่าสุด"""
         return self.transactions[-count:]
 
     def load_page(self, page_name):
-        """เมธอดสำหรับโหลดหน้าต่างๆ ใน Content Frame"""
         for widget in self.content_frame.winfo_children():
             widget.destroy()
         
@@ -68,7 +86,6 @@ class App(ctk.CTk):
             ProfilePage(parent=self.content_frame, main_app=self)
 
     def create_main_app_view(self):
-        """สร้าง View หลักที่มี Sidebar และ Content Frame"""
         for widget in self.winfo_children():
             widget.destroy()
 

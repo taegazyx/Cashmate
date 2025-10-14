@@ -2,7 +2,6 @@
 import customtkinter as ctk
 
 class DashboardPage:
-    # <--- แก้ไขบรรทัดนี้ให้รับ main_app ---
     def __init__(self, parent, main_app):
         self.main_app = main_app 
         self.frame = ctk.CTkFrame(parent, fg_color="transparent")
@@ -15,8 +14,10 @@ class DashboardPage:
         # --- ดึงข้อมูลจริงจาก main_app มาแสดง ---
         balance = self.main_app.calculate_balance()
         recent_transactions = self.main_app.get_recent_transactions()
-        total_income = self.main_app.income
-        total_expense = sum(t['amount'] for t in self.main_app.transactions)
+        
+        # <--- แก้ไขการคำนวณ total_income และ total_expense ที่นี่ ---
+        total_income = sum(t['amount'] for t in self.main_app.transactions if t.get('type') == 'Income')
+        total_expense = sum(t['amount'] for t in self.main_app.transactions if t.get('type') == 'Expense')
 
         # --- Widget ยอดเงินคงเหลือ ---
         balance_frame = ctk.CTkFrame(self.frame)
@@ -37,10 +38,9 @@ class DashboardPage:
         actions_frame.grid_columnconfigure(0, weight=1)
         actions_frame.grid_rowconfigure(0, weight=1)
         
-        # เพิ่ม command ให้ปุ่มกดสลับหน้าได้
-        add_income_btn = ctk.CTkButton(actions_frame, text="➕ Add Income/Expense", height=50,
-                                       command=lambda: self.main_app.load_page("Add Income/Expense"))
-        add_income_btn.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+        add_button = ctk.CTkButton(actions_frame, text="➕ Add Income/Expense", height=50,
+                                   command=lambda: self.main_app.load_page("Add Income/Expense"))
+        add_button.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
 
         # --- Widget รายการล่าสุด ---
         recent_frame = ctk.CTkFrame(self.frame)
@@ -50,9 +50,14 @@ class DashboardPage:
         if not recent_transactions:
             ctk.CTkLabel(recent_frame, text="No recent transactions.").pack(expand=True)
         else:
+            # <--- แก้ไขการแสดงผลให้รองรับทั้ง Income และ Expense ---
             for tx in reversed(recent_transactions):
-                amount_str = f"-฿{tx['amount']:,.2f}"
-                color = "#E74C3C"
+                if tx.get('type') == 'Income':
+                    amount_str = f"+฿{tx['amount']:,.2f}"
+                    color = "#2ECC71" # สีเขียว
+                else: # 'Expense'
+                    amount_str = f"-฿{tx['amount']:,.2f}"
+                    color = "#E74C3C" # สีแดง
                 
                 item_frame = ctk.CTkFrame(recent_frame, fg_color="transparent")
                 item_frame.pack(fill="x", padx=20, pady=2)
