@@ -197,7 +197,7 @@ def update_display():
         balance_amount_label.configure(text=balance_display)
 
 def switch_page(target_page):
-    """Switches the view between Home and Profile pages. (Currently only switches to 'home')."""
+    """Switches the view between Home and Profile pages."""
     global current_page
     current_page = target_page
     
@@ -365,14 +365,8 @@ def setup_ui():
     
     next_row += 1
 
-
-    # 3. Back to Home Button (Footer)
-    home_btn = ctk.CTkButton(scroll_frame, text="Back to Home", font=("Arial Rounded MT Bold", 18),
-                             fg_color="#34D399", text_color="white", hover_color=ACCENT_COLOR,
-                             height=50, corner_radius=25,
-                             command=lambda: switch_page("home"))
-    home_btn.grid(row=next_row, column=0, columnspan=2, pady=(0, 15), padx=10, sticky="ew")
-    next_row += 1
+    # 📌 ลบปุ่ม "Back to Home" ที่ซ้ำซ้อนออกจาก Home Page (Footer)
+    # next_row += 1
 
 
     # =================================================================
@@ -398,6 +392,18 @@ def setup_ui():
     ctk.CTkButton(profile_inner_frame, text="Change Password", fg_color=BUTTON_COLOR, text_color="white", height=45, corner_radius=10).pack(pady=10, padx=30, fill="x")
     ctk.CTkButton(profile_inner_frame, text="App Theme (Light/Dark)", fg_color=BUTTON_COLOR, text_color="white", height=45, corner_radius=10).pack(pady=10, padx=30, fill="x")
     ctk.CTkButton(profile_inner_frame, text="Export Data", fg_color=BUTTON_COLOR, text_color="white", height=45, corner_radius=10).pack(pady=10, padx=30, fill="x")
+
+    # 🟢 เพิ่มปุ่ม "Back to Home" ที่นี่เพื่อให้ผู้ใช้กลับไปยังหน้าหลักได้จากหน้าโปรไฟล์
+    ctk.CTkButton(profile_inner_frame, 
+                  text="กลับสู่หน้าหลัก (Back to Home)", 
+                  font=("Arial Rounded MT Bold", 18),
+                  fg_color="#34D399", 
+                  text_color="white", 
+                  hover_color=ACCENT_COLOR,
+                  height=50, 
+                  corner_radius=10,
+                  command=lambda: switch_page("home")
+    ).pack(pady=(20, 30), padx=30, fill="x")
 
 
     # --- Initialization ---
