@@ -7,6 +7,7 @@ def back_to_profile():
     root.destroy()  # Close current window
     import Profile
     new_window = ctk.CTk()
+    new_window.geometry("900x600")  # Set consistent window size
     Profile.create_profile_page(new_window)
     new_window.mainloop()
 

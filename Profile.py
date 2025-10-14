@@ -8,6 +8,7 @@ def open_edit_profile():
     root.destroy()  # Close current window
     import Edit_Profile
     new_window = ctk.CTk()
+    new_window.geometry("900x600")  # Set consistent window size
     Edit_Profile.create_edit_profile_page(new_window)
     new_window.mainloop()
 
@@ -15,6 +16,7 @@ def open_change_password():
     root.destroy()  # Close current window
     import change_password
     new_window = ctk.CTk()
+    new_window.geometry("900x600")  # Set consistent window size
     change_password.create_change_password_page(new_window)
     new_window.mainloop()
 
@@ -222,6 +224,7 @@ def create_profile_page(root):
         root.destroy()  # Close current window
         import privacy_policy
         new_window = ctk.CTk()
+        new_window.geometry("900x600")  # Set consistent window size
         privacy_policy.create_privacy_page(new_window)
         new_window.mainloop()
 
