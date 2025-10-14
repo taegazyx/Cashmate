@@ -103,16 +103,16 @@ def create_privacy_page(root):
     privacy_title = ctk.CTkLabel(
         scrollable_frame,
         text="Privacy Policy",
-        font=ctk.CTkFont(size=20, weight="bold"),
+        font=ctk.CTkFont(size=24, weight="bold"),
         text_color="#333333"
     )
-    privacy_title.pack(pady=(20, 10), padx=20)
+    privacy_title.pack(pady=(20, 10), padx=(320, 0))
 
     privacy_text = """
 1. Information Collection
    • We collect basic user information for account creation
    • Financial data is stored securely and encrypted
-   • We do not share your personal information with third parties
+   • We do not share your personal information with third parties 
 
 2. Data Security
    • Your data is protected using industry-standard encryption
@@ -143,10 +143,10 @@ def create_privacy_page(root):
     usage_title = ctk.CTkLabel(
         scrollable_frame,
         text="How to Use CashMate",
-        font=ctk.CTkFont(size=20, weight="bold"),
+        font=ctk.CTkFont(size=24, weight="bold"),
         text_color="#333333"
     )
-    usage_title.pack(pady=(20, 10), padx=20)
+    usage_title.pack(pady=(20, 10), padx=(200, 0))
 
     usage_text = """
 1. Profile Management
