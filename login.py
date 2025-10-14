@@ -1,22 +1,30 @@
 import tkinter as tk
 from tkinter import messagebox
 from PIL import Image, ImageTk
+from db import init_db, verify_user, create_user
+import home
 
-# -------------------- แอ็กชันพื้นฐาน --------------------
+
+# -------------------- ACTIONS --------------------
 def login_action():
     username = username_entry.get()
     password = password_entry.get()
     if not username or not password:
         messagebox.showwarning("Input Error", "Please enter both username and password.")
         return
-    # TODO: ตรวจ DB ที่นี่
-    messagebox.showinfo("Login Successful", f"Welcome, {username}!")
+
+    ok, msg = verify_user(username, password)
+    if ok:
+        home.open_home(root, username)
+    else:
+        messagebox.showerror("Login Failed", msg)
+
 
 def register_action():
     fullname = reg_fullname_entry.get()
     username = reg_username_entry.get()
     password = reg_password_entry.get()
-    confirm  = reg_confirm_entry.get()
+    confirm = reg_confirm_entry.get()
 
     if not (fullname and username and password and confirm):
         messagebox.showwarning("Input Error", "Please fill in all fields.")
@@ -24,13 +32,20 @@ def register_action():
     if password != confirm:
         messagebox.showwarning("Input Error", "Passwords do not match.")
         return
-    # TODO: บันทึกผู้ใช้ใหม่ลง DB ที่นี่
-    messagebox.showinfo("Registration", f"Account created for {username}!")
-    draw_login()  # กลับไปหน้า Login หลังสมัครสำเร็จ
 
-# -------------------- สลับหน้า/เลย์เอาต์ --------------------
-current_widgets = []   # เก็บวิดเจ็ตที่ถูก create_window เพื่อทำลายตอนสลับหน้า
+    ok, msg = create_user(fullname, username, password)
+    if ok:
+        messagebox.showinfo("Registration", msg)
+        draw_login()
+    else:
+        messagebox.showerror("Registration Failed", msg)
+
+
+# -------------------- PAGE SWITCH / HELPERS --------------------
+current_widgets = []  # เก็บ widget ที่สร้างไว้
+
 def clear_page():
+    """ล้างหน้าและวาดพื้นหลังใหม่"""
     global current_widgets
     for w in current_widgets:
         try:
@@ -39,27 +54,27 @@ def clear_page():
             pass
     current_widgets = []
     canvas.delete("all")
-    # วาดพื้นหลังทุกครั้ง
     canvas.create_image(0, 0, image=bg, anchor="nw")
 
+
 def attach_pw_toggle(entry_widget):
-    state = {"show": True}
+    """ดับเบิลคลิกเพื่อสลับโชว์/ซ่อนรหัส"""
+    state = {"hide": True}
     def _toggle(_=None):
-        state["show"] = not state["show"]
-        entry_widget.configure(show="" if state["show"] else "*")
+        state["hide"] = not state["hide"]
+        entry_widget.configure(show="" if state["hide"] else "*")
     entry_widget.bind("<Double-Button-1>", _toggle)
 
-# -------------------- หน้า LOGIN --------------------
+
+# -------------------- LOGIN PAGE --------------------
 def draw_login():
     clear_page()
 
-    # โลโก้
-    try:
+    if logo is not None:
         canvas.create_image(x_center, y_start, image=logo)
-    except Exception:
+    else:
         canvas.create_text(x_center, y_start, text="[Logo Missing]", fill="grey", font=("Arial", 14))
 
-    # ชื่อแอป
     canvas.create_text(x_center, y_start + 100, text="CashMate App",
                        font=("Arial", 26, "bold"), fill="#000000")
 
@@ -94,28 +109,26 @@ def draw_login():
     current_widgets.append(login_button)
     canvas.create_window(x_center, y_start + 330, window=login_button)
 
-    # ลิงก์ไปหน้า Register
+    # ลิงก์ไป Register
     link_to_reg = tk.Button(root, text="Create an account", font=("Arial", 11, "underline"),
                             fg="#0d6efd", bg="#ffffff", bd=0, cursor="hand2",
                             activeforeground="#0d6efd", command=draw_register)
     current_widgets.append(link_to_reg)
     canvas.create_window(x_center, y_start + 370, window=link_to_reg)
 
-    # โฟกัส + Enter = Login
     username_entry.focus_set()
     root.bind("<Return>", lambda e: login_button.invoke())
 
-# -------------------- หน้า REGISTER --------------------
+
+# -------------------- REGISTER PAGE --------------------
 def draw_register():
     clear_page()
 
-    # โลโก้
-    try:
+    if logo is not None:
         canvas.create_image(x_center, y_start, image=logo)
-    except Exception:
+    else:
         canvas.create_text(x_center, y_start, text="[Logo Missing]", fill="grey", font=("Arial", 14))
 
-    # ชื่อแอป (หัวข้อเปลี่ยน)
     canvas.create_text(x_center, y_start + 100, text="Create Account",
                        font=("Arial", 26, "bold"), fill="#000000")
 
@@ -170,7 +183,7 @@ def draw_register():
     current_widgets.append(reg_button)
     canvas.create_window(x_center, y_start + 460, window=reg_button)
 
-    # ลิงก์กลับหน้า Login
+    # ลิงก์กลับ Login
     link_to_login = tk.Button(root, text="Back to Login", font=("Arial", 11, "underline"),
                               fg="#0d6efd", bg="#ffffff", bd=0, cursor="hand2",
                               activeforeground="#0d6efd", command=draw_login)
@@ -178,37 +191,36 @@ def draw_register():
     canvas.create_window(x_center, y_start + 500, window=link_to_login)
 
     reg_fullname_entry.focus_set()
-    # Enter = Register
     root.bind("<Return>", lambda e: reg_button.invoke())
 
-# -------------------- สร้างหน้าต่าง/รูปพื้นหลัง --------------------
+
+# -------------------- WINDOW / CANVAS / ASSETS --------------------
 root = tk.Tk()
 root.title("CashMate App Login")
 root.geometry("900x600")
 
 # ไอคอน
-icon_img = tk.PhotoImage(file="bg.png")
-root.iconphoto(False, icon_img)
+try:
+    icon_img = tk.PhotoImage(file="bg.png")
+    root.iconphoto(False, icon_img)
+except Exception:
+    pass
 
-# Canvas และ BG
 canvas = tk.Canvas(root, width=900, height=600, highlightthickness=0, bd=0, bg="#ffffff")
 canvas.pack(fill="both", expand=True)
 
 bg_img = Image.open("BG2.png").resize((900, 600))
 bg = ImageTk.PhotoImage(bg_img)
 
-# โลโก้
 try:
-    _logo_pil = Image.open("KMITL LOGO.png").resize((140, 140))
-    logo = ImageTk.PhotoImage(_logo_pil)
+    logo_img_pil = Image.open("KMITL LOGO.png").resize((140, 140))
+    logo = ImageTk.PhotoImage(logo_img_pil)
 except Exception:
-    logo = None  # จะวาดเป็นข้อความแทน
+    logo = None
 
-# ตำแหน่งคอลัมน์ (เลย์เอาต์แนวตั้ง)
 x_center = 300
 y_start = 150
 
-# เริ่มที่หน้า Login
+init_db()
 draw_login()
-
 root.mainloop()
