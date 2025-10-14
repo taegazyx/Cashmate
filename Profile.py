@@ -256,7 +256,7 @@ def create_profile_page(root):
 if __name__ == "__main__":
     root = ctk.CTk()
     root.title("User Profile")
-    root.geometry("400x700")
+    root.geometry("900x600")
     
     create_profile_page(root)
     
