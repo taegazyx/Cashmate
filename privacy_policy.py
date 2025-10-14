@@ -107,7 +107,7 @@ def create_privacy_page(root):
         font=ctk.CTkFont(size=24, weight="bold"),
         text_color="#333333"
     )
-    privacy_title.pack(pady=(20, 10), padx=(320, 0))
+    privacy_title.pack(pady=(20, 10), padx=(285, 0))
 
     privacy_text = """
 1. Information Collection
@@ -147,7 +147,7 @@ def create_privacy_page(root):
         font=ctk.CTkFont(size=24, weight="bold"),
         text_color="#333333"
     )
-    usage_title.pack(pady=(20, 10), padx=(200, 0))
+    usage_title.pack(pady=(20, 10), padx=(280, 0))
 
     usage_text = """
 1. Profile Management
