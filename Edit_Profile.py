@@ -208,7 +208,7 @@ def create_edit_profile_page(root):
 if __name__ == "__main__":
     root = ctk.CTk()
     root.title("Edit Profile")
-    root.geometry("400x700")
+    root.geometry("900x600")
     
     create_edit_profile_page(root)
     

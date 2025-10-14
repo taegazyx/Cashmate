@@ -151,7 +151,7 @@ def create_change_password_page(root):
 if __name__ == "__main__":
     root = ctk.CTk()
     root.title("Change Password")
-    root.geometry("400x700")
+    root.geometry("900x600")
     
     create_change_password_page(root)
     
