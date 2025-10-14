@@ -173,9 +173,26 @@ def create_profile_page(root):
     profile_frame.bind("<Button-1>", lambda e: update_profile_picture(profile_pic_label))
 
     # User information
+    # Read user information from file
+    try:
+        import json
+        with open("user_info.json", "r") as f:
+            user_data = json.load(f)
+    except FileNotFoundError:
+        user_data = {
+            "name": "Name :",
+            "email": "xxx@gmail.com"
+        }
+    except Exception as e:
+        print(f"Error loading user data: {e}")
+        user_data = {
+            "name": "Name :",
+            "email": "xxx@gmail.com"
+        }
+
     name_label = ctk.CTkLabel(
         content_frame,
-        text="Name :",
+        text=f"Name : {user_data.get('name', '')}",
         font=ctk.CTkFont(size=16),
         text_color="#666666"
     )
@@ -183,7 +200,7 @@ def create_profile_page(root):
 
     email_label = ctk.CTkLabel(
         content_frame,
-        text="Email : xxx@gmail.com",
+        text=f"Email : {user_data.get('email', 'xxx@gmail.com')}",
         font=ctk.CTkFont(size=16),
         text_color="#666666"
     )

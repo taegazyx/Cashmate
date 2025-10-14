@@ -168,29 +168,33 @@ def create_edit_profile_page(root):
     email_entry = ctk.CTkEntry(content_frame, placeholder_text="Email", **entry_style)
     email_entry.pack(pady=5)
     email_entry.insert(0, "xxx@gmail.com") # Pre-fill with a placeholder email
-    
-    # Phone Number
-    phone_entry = ctk.CTkEntry(content_frame, placeholder_text="Phone Number", **entry_style)
-    phone_entry.pack(pady=5)
-    
-    # Address
-    address_entry = ctk.CTkEntry(content_frame, placeholder_text="Address", **entry_style)
-    address_entry.pack(pady=5)
 
     # Save Changes button
     def save_changes():
-        # This function would contain the logic to save the updated user information
-        # For this example, we'll just print the new data.
+        # Get the updated information
         name = name_entry.get()
         email = email_entry.get()
-        phone = phone_entry.get()
-        address = address_entry.get()
         
-        print(f"Saving changes...")
-        print(f"Name: {name}")
-        print(f"Email: {email}")
-        print(f"Phone: {phone}")
-        print(f"Address: {address}")
+        # Save the user information to a file
+        import json
+        user_data = {
+            "name": name,
+            "email": email
+        }
+        
+        try:
+            with open("user_info.json", "w") as f:
+                json.dump(user_data, f)
+            
+            # Return to profile page after saving
+            root.destroy()
+            import Profile
+            new_window = ctk.CTk()
+            new_window.geometry("900x600")
+            Profile.create_profile_page(new_window)
+            new_window.mainloop()
+        except Exception as e:
+            print(f"Error saving user data: {e}")
 
     save_btn = ctk.CTkButton(
         content_frame,
