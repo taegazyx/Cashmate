@@ -2,6 +2,17 @@ import customtkinter as ctk
 from PIL import Image, ImageDraw
 from tkinter import filedialog # ต้อง import filedialog เพื่อใช้ในการเลือกไฟล์รูปภาพ
 
+# 🟢 IMPORT NOTIFICATION FUNCTIONS
+try:
+    from finance_notifier import notify_expense, notify_income
+except ImportError:
+    print("⚠️ Warning: Could not import 'finance_notifier.py'. Notifications will be disabled.")
+    # Define dummy functions if the file is missing to prevent crashing
+    def notify_expense(*args, **kwargs):
+        pass
+    def notify_income(*args, **kwargs):
+        pass
+
 # ---------- Global Variables ----------
 income_amount = 0
 balance_amount = 0
@@ -73,26 +84,6 @@ class ExpenseDialog(ctk.CTkToplevel):
             )
             self.desc_entry.pack(padx=20, fill="x")
 
-        # Image Upload Section (Removed)
-        # ctk.CTkLabel(self, text="3. รูปภาพ (Optional):", font=("Arial", 14), text_color="#34D399").pack(padx=20, pady=(10, 0), anchor="w")
-        
-        # image_frame = ctk.CTkFrame(self, fg_color="transparent")
-        # image_frame.pack(padx=20, fill="x")
-        # image_frame.grid_columnconfigure(0, weight=1)
-        
-        # self.image_path_label = ctk.CTkLabel(image_frame, text="ไม่มีไฟล์ที่เลือก", fg_color="#F3F4F6", text_color="#6B7280", corner_radius=5, wraplength=200)
-        # self.image_path_label.grid(row=0, column=0, sticky="ew", padx=(0, 10))
-        
-        # self.choose_image_button = ctk.CTkButton(
-        #     image_frame, 
-        #     text="เลือกรูปภาพ", 
-        #     command=self.choose_image, # Removed command
-        #     fg_color="#34D399", 
-        #     hover_color="#059669", 
-        #     width=100
-        # )
-        # self.choose_image_button.grid(row=0, column=1, sticky="e")
-
         # Add Button
         # 📌 ปรับ padding ตามความเหมาะสมเมื่อมี/ไม่มีช่อง Description
         pady_top = 20 if is_other else 30
@@ -104,11 +95,6 @@ class ExpenseDialog(ctk.CTkToplevel):
 
         # Bind Esc key to close
         self.bind('<Escape>', lambda e: self.destroy())
-
-    # Removed choose_image method
-    # def choose_image(self):
-    #     """Opens file dialog to select an image file."""
-    #     ...
 
     def submit(self):
         amount_str = self.amount_entry.get().replace(',', '')
@@ -135,8 +121,7 @@ class ExpenseDialog(ctk.CTkToplevel):
                 self.destroy()
             else:
                 print("❌ จำนวนเงินต้องเป็นจำนวนเต็มบวก")
-                # Use a custom message box instead of printing to console for user visibility
-                self.master.update_idletasks() # Ensure UI is updated before showing next dialog
+                self.master.update_idletasks() 
                 ctk.CTkMessagebox(title="ข้อผิดพลาด", message="กรุณาใส่จำนวนเงินที่ถูกต้องและเป็นบวก", icon="cancel")
         except ValueError:
             print("❌ กรุณากรอกจำนวนเงินที่ถูกต้อง")
@@ -147,7 +132,7 @@ class ExpenseDialog(ctk.CTkToplevel):
 # --- Utility Functions ---
 
 def open_set_income_dialog():
-    """Opens a dialog to set the initial income."""
+    """Opens a dialog to set the initial income and calls notify_income."""
     global income_amount, balance_amount
     dialog = ctk.CTkInputDialog(text="กรอกจำนวนรายรับ (Bath):", title="บันทึกรายรับ")
     amount_str = dialog.get_input()
@@ -159,25 +144,41 @@ def open_set_income_dialog():
             income_amount = amount
             balance_amount = amount
             update_display()
+            
+            # 🟢 CALL notify_income HERE
+            # NOTE: Since this dialog doesn't capture category/note, we use defaults
+            notify_income(
+                amount=amount, 
+                category="รายรับ", 
+                note="รายรับใหม่", 
+                balance=balance_amount
+            )
         else:
             print("❌ กรุณากรอกตัวเลขรายรับที่เป็นบวก")
     except (ValueError, TypeError):
         print("❌ ไม่ได้กรอกจำนวนเงินที่ถูกต้อง")
 
-def process_expense(category, amount, description): # Removed image_path parameter
-    """Processes the expense data submitted from the dialog."""
+def process_expense(category, amount, description): 
+    """Processes the expense data submitted and calls notify_expense."""
     global balance_amount
+    
+    # 1. Update global balance
     balance_amount -= amount
     expenses[category] += amount
     
-    # Log all captured data (description is now guaranteed)
+    # 2. Update display
+    update_display()
+    
+    # 3. Log/Notification
     print(f"✅ บันทึกรายจ่าย: {amount} บาท | หมวดหมู่: {category} | ชื่อรายการ: {description}") 
     
-    update_display()
-    # In a real app, this should update the transaction list, but since we only display category totals:
-    # We update the total here for visual confirmation (if implemented).
-    # if category in category_totals:
-    #      category_totals[category].configure(text=f"รวม: {expenses[category]:,.0f} บาท")
+    # 🟢 CALL notify_expense HERE
+    notify_expense(
+        amount=amount, 
+        category=category, 
+        note=description,          # description is passed as note
+        balance=balance_amount     # Pass the new balance
+    )
 
 
 def add_expense(category):
@@ -246,13 +247,13 @@ def setup_ui():
     app.geometry("900x600") 
     
     # --- Image Loading ---
+    # NOTE: These image files must exist or placeholders will be used
     img_bank = safe_load_image("bank.png", size=(50, 50))
     img_income_icon = safe_load_image("income.png", size=(40, 40))
     img_balance_icon = safe_load_image("balance.png", size=(40, 40))
     img_profile_icon = safe_load_image("image_e3035c.png", size=(30, 30)) 
     
     icon_images = {
-        # 🟢 ถูกแก้ไขเป็น food.png ในการตอบกลับครั้งก่อน
         "Food": safe_load_image("food.png", size=(60, 60)), 
         "Transport": safe_load_image("transport.png", size=(60, 60)),
         "Entertainment": safe_load_image("entertainment.png", size=(60, 60)),
@@ -295,13 +296,12 @@ def setup_ui():
     profile_btn = ctk.CTkButton(
         top_bar_frame, 
         image=img_profile_icon, 
-        text="", # ⚙️ แก้ไข: ลบข้อความ "..." ออก ให้เหลือแต่ไอคอน
+        text="", 
         width=30, 
         height=30, 
-        # compound="right", # ไม่จำเป็นต้องใช้ compound เมื่อไม่มีข้อความ
         fg_color="transparent", 
         hover_color="#A7F3D0",
-        command=lambda: switch_page("profile") # เพิ่มคำสั่งสลับหน้า
+        command=lambda: switch_page("profile") 
     )
     profile_btn.place(relx=1.0, rely=0.0, anchor="ne", x=-5, y=5) 
 
@@ -317,6 +317,7 @@ def setup_ui():
     income_amount_label = ctk.CTkLabel(income_card_frame, text=" xxxx Bath", font=("Arial Rounded MT Bold", 20), text_color="#064E3B")
     income_amount_label.grid(row=0, column=1, sticky="e", padx=20) 
 
+    # 📌 CALL open_set_income_dialog to trigger income input AND NOTIFICATION
     income_card_frame.bind("<Button-1>", lambda event: open_set_income_dialog())
 
 
@@ -339,7 +340,7 @@ def setup_ui():
             height=130, 
             width=140, 
             compound="top", 
-            # 🌟 UPDATED: Call add_expense which now opens the custom dialog
+            # 📌 CALL add_expense which leads to process_expense AND NOTIFICATION
             command=lambda c=cat["name"]: add_expense(c), 
             fg_color=BUTTON_COLOR,       
             hover_color=ACCENT_COLOR,    
@@ -365,12 +366,8 @@ def setup_ui():
     
     next_row += 1
 
-    # 📌 ลบปุ่ม "Back to Home" ที่ซ้ำซ้อนออกจาก Home Page (Footer)
-    # next_row += 1
-
-
     # =================================================================
-    # PROFILE PAGE UI (Kept definition but not functional)
+    # PROFILE PAGE UI
     # =================================================================
 
     # Create a main container for the Profile Page (initially hidden)
@@ -393,7 +390,7 @@ def setup_ui():
     ctk.CTkButton(profile_inner_frame, text="App Theme (Light/Dark)", fg_color=BUTTON_COLOR, text_color="white", height=45, corner_radius=10).pack(pady=10, padx=30, fill="x")
     ctk.CTkButton(profile_inner_frame, text="Export Data", fg_color=BUTTON_COLOR, text_color="white", height=45, corner_radius=10).pack(pady=10, padx=30, fill="x")
 
-    # 🟢 เพิ่มปุ่ม "Back to Home" ที่นี่เพื่อให้ผู้ใช้กลับไปยังหน้าหลักได้จากหน้าโปรไฟล์
+    # 🟢 เพิ่มปุ่ม "Back to Home"
     ctk.CTkButton(profile_inner_frame, 
                   text="กลับสู่หน้าหลัก (Back to Home)", 
                   font=("Arial Rounded MT Bold", 18),
