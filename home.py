@@ -1,6 +1,8 @@
-# main_app.py
+# main_app.py (ฉบับแก้ไขสมบูรณ์)
 import customtkinter as ctk
 from tkinter import messagebox
+
+# --- 1. เพิ่ม Import สำหรับหน้า AddPage ---
 from page_history import HistoryPage
 from page_profile import ProfilePage
 
@@ -33,33 +35,27 @@ class App(ctk.CTk):
             for widget in self.content_frame.winfo_children():
                 widget.destroy()
             
-            # --- 3. แก้ไขเงื่อนไขการโหลดหน้า ---
+            # --- 2. แก้ไขเงื่อนไขการโหลดหน้า ---
             if content_name == "Add Income/Expense":
-                # AddPage(parent=self.content_frame) # (ถ้ามีไฟล์นี้ ก็เปิดใช้งาน)
-                pass # ลบ pass ออกเมื่อมี AddPage
+                AddPage(parent=self.content_frame) # <--- เปิดใช้งานบรรทัดนี้
             
             elif content_name == "History":
                 HistoryPage(parent=self.content_frame)
             
-            elif content_name == "Profile": # <--- เพิ่มเงื่อนไขสำหรับ Profile
+            elif content_name == "Profile":
                 ProfilePage(parent=self.content_frame)
-
-            # (ลบ elif ของ Summary และ Budget ออกไป)
             
             else: 
                 ctk.CTkLabel(self.content_frame, text=content_name, font=("Arial Bold", 22),
                              text_color="#333333").pack(pady=30)
 
-        # --- 2. แก้ไขรายการเมนูใน Sidebar ---
+        # รายการเมนูใน Sidebar (เหมือนเดิม)
         menu_items = [
             ("🏠 Dashboard", "Dashboard Home"),
             ("➕ Add Income/Expense", "Add Income/Expense"),
             ("📜 History", "History"),
-            ("👤 Profile", "Profile"), # <--- เพิ่ม Profile
-            # ("📊 Summary/Stats", "Summary/Stats"), <--- ลบออก
-            # ("💰 Budget", "Budget"), <--- ลบออก
+            ("👤 Profile", "Profile"),
         ]
-        # ------------------------------------
 
         for text, page in menu_items:
             ctk.CTkButton(sidebar, text=text, fg_color="#7733AA", hover_color="#9955CC",
