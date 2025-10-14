@@ -164,7 +164,7 @@ class CashMateApp(ctk.CTk):
             amount = float(str(amount_str).replace(',', '')) 
             if amount > 0:
                 current_date = dt.today().isoformat()
-                description = "รายรับใหม่"
+                description = "รายรับ"
                 category = "General" 
                 
                 if self.db_manager.add_transaction("Income", category, description, amount, current_date):
