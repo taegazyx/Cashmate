@@ -1,12 +1,15 @@
-# main_app.py (ฉบับเริ่มต้นที่ Dashboard)
+# main_app.py (ฉบับสมบูรณ์พร้อมระบบแจ้งเตือน)
 import customtkinter as ctk
 from tkinter import messagebox
 
-# --- Import ทุกหน้าที่จำเป็น (ยกเว้น Login) ---
+# --- Import ทุกหน้าที่จำเป็น ---
 from page_history import HistoryPage
 from page_profile import ProfilePage
 from page_add import AddPage
 from page_dashboard import DashboardPage
+
+# <--- 1. Import ฟังก์ชันแจ้งเตือนเข้ามา ---
+from finance_notifier import notify_income, notify_expense
 
 class App(ctk.CTk):
     def __init__(self):
@@ -14,31 +17,31 @@ class App(ctk.CTk):
         self.geometry("900x600")
         self.resizable(0, 0)
         self.title("CASHMATH")
-
-        # --- "ฐานข้อมูลชั่วคราว" ในแอป ---
         self.income = 0.0
-        self.transactions = [] # ลิสต์สำหรับเก็บทุกรายการ
-
-        # --- เรียกใช้เมธอดสร้าง Dashboard ทันที ---
+        self.transactions = []
         self.create_main_app_view()
 
     def add_expense(self, category, amount, description):
         """เมธอดสำหรับเพิ่มรายจ่าย"""
-        transaction_data = {
-            "category": category,
-            "amount": float(amount),
-            "desc": description
-        }
+        transaction_data = {"category": category, "amount": float(amount), "desc": description}
         self.transactions.append(transaction_data)
-        print("Expense added:", transaction_data)
-        # รีเฟรชหน้าจอทั้งหมดเพื่ออัปเดตข้อมูล
+        
+        # <--- 2. ยิงแจ้งเตือนหลังจากบันทึกข้อมูล! ---
+        current_balance = self.calculate_balance()
+        notify_expense(amount=float(amount), category=category, balance=current_balance)
+
+        # รีเฟรชหน้าจอ (เหมือนเดิม)
         self.create_main_app_view()
 
     def set_income(self, amount):
         """เมธอดสำหรับตั้งค่ารายรับ"""
         self.income = float(amount)
-        print(f"Income set to: {self.income}")
-        # รีเฟรชหน้าจอทั้งหมดเพื่ออัปเดตข้อมูล
+
+        # <--- 3. ยิงแจ้งเตือนหลังจากบันทึกข้อมูล! ---
+        current_balance = self.calculate_balance()
+        notify_income(amount=float(amount), balance=current_balance)
+        
+        # รีเฟรชหน้าจอ (เหมือนเดิม)
         self.create_main_app_view()
 
     def calculate_balance(self):
@@ -90,15 +93,12 @@ class App(ctk.CTk):
             ctk.CTkButton(sidebar, text=text, fg_color="#7733AA", hover_color="#9955CC",
                           command=lambda p=page: self.load_page(p)).pack(fill="x", pady=5, padx=10)
         
-        # --- เปลี่ยนปุ่ม Logout เป็น Exit ---
         ctk.CTkButton(sidebar, text="🚪 Exit", fg_color="#AA3333", hover_color="#CC4444",
                       command=self.quit_app).pack(fill="x", side="bottom", pady=20, padx=10)
 
-        # โหลดหน้า Dashboard เป็นหน้าแรก
         self.load_page("Dashboard Home")
 
     def quit_app(self):
-        """ฟังก์ชันสำหรับปิดโปรแกรม"""
         self.destroy()
 
 if __name__ == "__main__":
