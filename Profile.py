@@ -257,18 +257,6 @@ def create_profile_page(root):
         command=open_privacy_policy
     )
     privacy_btn.pack(pady=5)
-    
-    logout_btn = ctk.CTkButton(
-        button_frame2,
-        text="Logout",
-        fg_color="#666666",
-        hover_color="#4D4D4D",
-        width=120,
-        height=35,
-        corner_radius=8,
-        font=ctk.CTkFont(size=14)
-    )
-    logout_btn.pack(pady=5)
 
 
 
